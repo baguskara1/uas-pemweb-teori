@@ -26,24 +26,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-[#161616] px-4 text-white">
+      <div className="w-full max-w-md bg-white/5 border border-white/10 p-8 rounded-3xl backdrop-blur-sm">
         <div className="text-center mb-8">
-          <h1 className="font-display text-4xl font-semibold text-text-dominant mb-2">Masuk</h1>
-          <p className="font-text text-text-secondary">Masuk ke akun Sewa Kamera Ryox Anda</p>
+          <h1 className="font-display text-4xl font-semibold text-white mb-2">Masuk</h1>
+          <p className="font-text text-white/60">Masuk ke akun Sewa Kamera Ryox Anda</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-input p-4">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="bg-rose-500/10 border border-rose-500/20 rounded-input p-4">
+              <p className="text-sm text-rose-300">{error}</p>
             </div>
           )}
 
           <div>
             <label
               htmlFor="email"
-              className="block font-text text-xs font-semibold text-text-dominant mb-2"
+              className="block font-text text-xs font-semibold text-white mb-2"
             >
               Email
             </label>
@@ -53,7 +53,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full h-touch px-4 font-text text-text-dominant bg-white border border-surface-light rounded-input focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10 transition-colors"
+              className="w-full h-touch px-4 font-text text-white bg-white/5 border border-white/10 rounded-input focus:outline-none focus:border-[#FDD26E] focus:ring-3 focus:ring-[#FDD26E]/10 transition-colors"
               placeholder="nama@email.com"
             />
           </div>
@@ -61,7 +61,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="block font-text text-xs font-semibold text-text-dominant mb-2"
+              className="block font-text text-xs font-semibold text-white mb-2"
             >
               Password
             </label>
@@ -71,7 +71,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full h-touch px-4 font-text text-text-dominant bg-white border border-surface-light rounded-input focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10 transition-colors"
+              className="w-full h-touch px-4 font-text text-white bg-white/5 border border-white/10 rounded-input focus:outline-none focus:border-[#FDD26E] focus:ring-3 focus:ring-[#FDD26E]/10 transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -79,18 +79,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-touch bg-primary hover:bg-primary-hover active:bg-primary-press text-white font-text rounded-button transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-touch bg-[#FDD26E] hover:bg-[#FED590] active:bg-[#FCC840] text-[#332A16] font-text rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
           >
             {loading ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="font-text text-text-secondary">
+          <p className="font-text text-white/60">
             Belum punya akun?{' '}
             <Link
               href="/register"
-              className="text-primary hover:text-primary-hover font-semibold transition-colors"
+              className="text-[#FDD26E] hover:text-[#FED590] font-semibold transition-colors"
             >
               Daftar sekarang
             </Link>
@@ -100,7 +100,7 @@ export default function LoginPage() {
         <div className="mt-4 text-center">
           <Link
             href="/"
-            className="font-text text-sm text-text-tertiary hover:text-primary transition-colors"
+            className="font-text text-sm text-white/45 hover:text-[#FDD26E] transition-colors"
           >
             ← Kembali ke beranda
           </Link>

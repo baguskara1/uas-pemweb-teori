@@ -86,16 +86,16 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
 
   return (
     <CamerasRealtimeProvider>
-      <div className="bg-white min-h-screen text-text-dominant pt-16">
+      <div className="bg-[#161616] min-h-screen text-white pt-16">
         <div className="mx-auto max-w-container px-4 py-12 sm:px-6 lg:px-8">
           <header className="mb-12">
-            <p className="font-text text-sm font-semibold tracking-[0.18em] text-primary uppercase mb-2">
+            <p className="font-text text-sm font-semibold tracking-[0.18em] text-[#FDD26E] uppercase mb-2">
               Katalog Sewa
             </p>
-            <h1 className="font-display text-4xl font-semibold tracking-[-0.03em] md:text-5xl">
+            <h1 className="font-display text-4xl font-semibold tracking-[-0.03em] md:text-5xl text-white">
               Pilih Gear Produksi Anda.
             </h1>
-            <p className="mt-4 font-text text-text-tertiary max-w-xl">
+            <p className="mt-4 font-text text-white/60 max-w-xl">
               Semua kamera siap digunakan dengan kondisi bersih, baterai penuh, dan aksesoris bawaan
               lengkap.
             </p>
@@ -161,7 +161,7 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                               <li>
                                 <Link
                                   href={buildPageUrl(currentPage - 1)}
-                                  className="grid place-items-center h-touch w-10 border border-surface-light rounded-full text-text-secondary hover:border-primary hover:text-primary transition-colors"
+                                  className="grid place-items-center h-touch w-10 border border-white/10 rounded-full text-white/75 hover:border-[#FDD26E] hover:text-[#FDD26E] transition-colors"
                                 >
                                   <ChevronLeft className="w-4 h-4" />
                                 </Link>
@@ -175,8 +175,8 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                                     href={buildPageUrl(pageNum)}
                                     className={`grid place-items-center h-touch w-10 rounded-full font-text text-sm transition-colors ${
                                       currentPage === pageNum
-                                        ? 'bg-primary text-white font-semibold'
-                                        : 'border border-surface-light text-text-secondary hover:border-primary hover:text-primary'
+                                        ? 'bg-[#FDD26E] text-[#332A16] font-semibold'
+                                        : 'border border-white/10 text-white/75 hover:border-[#FDD26E] hover:text-[#FDD26E]'
                                     }`}
                                   >
                                     {pageNum}
@@ -188,7 +188,7 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                               <li>
                                 <Link
                                   href={buildPageUrl(currentPage + 1)}
-                                  className="grid place-items-center h-touch w-10 border border-surface-light rounded-full text-text-secondary hover:border-primary hover:text-primary transition-colors"
+                                  className="grid place-items-center h-touch w-10 border border-white/10 rounded-full text-white/75 hover:border-[#FDD26E] hover:text-[#FDD26E] transition-colors"
                                 >
                                   <ChevronRight className="w-4 h-4" />
                                 </Link>
@@ -201,11 +201,11 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                   )}
                 </>
               ) : (
-                <div className="border border-dashed border-surface-light p-16 text-center">
-                  <h3 className="font-display text-2xl font-semibold mb-2">
+                <div className="border border-dashed border-white/10 p-16 text-center bg-white/5 rounded-2xl">
+                  <h3 className="font-display text-2xl font-semibold mb-2 text-white">
                     Kamera tidak ditemukan
                   </h3>
-                  <p className="font-text text-text-tertiary max-w-sm mx-auto">
+                  <p className="font-text text-white/50 max-w-sm mx-auto">
                     Coba kurangi filter atau cari kata kunci lain untuk menemukan kamera yang Anda
                     cari.
                   </p>

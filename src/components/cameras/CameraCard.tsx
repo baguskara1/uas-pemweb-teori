@@ -28,9 +28,9 @@ export function CameraCard({ camera }: CameraCardProps) {
   return (
     <Link
       href={`/cameras/${camera.id}`}
-      className="group flex flex-col bg-white border border-surface-light/50 transition-all duration-300 hover:shadow-lg hover:border-transparent"
+      className="group flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
     >
-      <div className="relative aspect-[4/3] w-full bg-surface-light overflow-hidden">
+      <div className="relative aspect-[4/3] w-full bg-white/5 overflow-hidden">
         {camera.image_url ? (
           <img
             src={camera.image_url}
@@ -39,16 +39,16 @@ export function CameraCard({ camera }: CameraCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className="grid h-full place-items-center bg-gradient-to-br from-white to-surface-light">
-            <Camera className="h-12 w-12 text-primary/80" />
+          <div className="grid h-full place-items-center bg-gradient-to-br from-white/5 to-transparent">
+            <Camera className="h-12 w-12 text-[#FDD26E]/50" />
           </div>
         )}
         <div className="absolute top-3 right-3">
           <span
             className={`px-3 py-1 font-text text-xs font-semibold rounded-full ${
               camera.is_available && camera.stock > 0
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/25'
+                : 'bg-rose-500/10 text-rose-400 border border-rose-500/25'
             }`}
           >
             {camera.is_available && camera.stock > 0 ? 'Tersedia' : 'Habis'}
@@ -57,15 +57,15 @@ export function CameraCard({ camera }: CameraCardProps) {
       </div>
 
       <div className="flex flex-col flex-1 p-5">
-        <p className="font-text text-xs text-text-tertiary uppercase tracking-wider">
+        <p className="font-text text-xs text-white/50 uppercase tracking-wider">
           {camera.brand} · {camera.type}
         </p>
-        <h3 className="mt-2 font-display text-xl font-semibold text-text-dominant group-hover:text-primary transition-colors line-clamp-1">
+        <h3 className="mt-2 font-display text-xl font-semibold text-white group-hover:text-[#FDD26E] transition-colors line-clamp-1">
           {camera.name}
         </h3>
-        <p className="mt-auto pt-4 font-text font-semibold text-primary">
+        <p className="mt-auto pt-4 font-text font-semibold text-[#FDD26E]">
           {formatCurrency(camera.price_per_day)}{' '}
-          <span className="text-xs font-normal text-text-tertiary">/ hari</span>
+          <span className="text-xs font-normal text-white/50">/ hari</span>
         </p>
       </div>
     </Link>

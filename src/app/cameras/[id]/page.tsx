@@ -1,7 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
 import { Camera, CheckCircle2, ChevronLeft, Calendar } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
+
+const Pill = ({ children }: { children: ReactNode }) => (
+  <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70">
+    {children}
+  </span>
+);
 
 export default async function CameraDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

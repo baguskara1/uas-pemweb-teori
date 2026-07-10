@@ -43,7 +43,7 @@ export default async function BookingsPage() {
 
   return (
     <BookingsRealtimeProvider userId={user.id}>
-      <div className="space-y-6">
+      <div className="space-y-6 text-white">
         <div className="flex justify-between items-center">
           <h1 className="font-display text-3xl font-semibold">Booking Saya</h1>
         </div>
@@ -55,13 +55,13 @@ export default async function BookingsPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-surface-light">
-            <Calendar className="w-16 h-16 mx-auto mb-4 text-text-tertiary" />
+          <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+            <Calendar className="w-16 h-16 mx-auto mb-4 text-white/30" />
             <h3 className="font-display text-xl font-semibold mb-2">Belum Ada Booking</h3>
-            <p className="text-text-tertiary mb-6">Anda belum pernah melakukan booking kamera</p>
+            <p className="text-white/50 mb-6">Anda belum pernah melakukan booking kamera</p>
             <a
               href="/cameras"
-              className="inline-block bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-hover transition-colors"
+              className="inline-block bg-[#FDD26E] text-[#332A16] px-6 py-3 rounded-full font-semibold hover:bg-[#FED590] transition-colors"
             >
               Jelajahi Kamera
             </a>

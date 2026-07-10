@@ -62,7 +62,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
   }, [searchParams]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 bg-white/5 border border-white/10 p-6 rounded-2xl">
       {/* Search */}
       <div>
         <label htmlFor="search" className="sr-only">
@@ -70,7 +70,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
         </label>
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-text-tertiary" />
+            <Search className="h-4 w-4 text-white/50" />
           </div>
           <input
             type="text"
@@ -78,7 +78,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-            className="block w-full rounded-input border border-surface-light bg-white py-2 pl-10 pr-3 font-text text-sm placeholder:text-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="block w-full rounded-input border border-white/10 bg-[#161616] py-2 pl-10 pr-3 font-text text-sm text-white placeholder:text-white/40 focus:border-[#FDD26E] focus:outline-none focus:ring-1 focus:ring-[#FDD26E]"
             placeholder="Cari model kamera..."
           />
         </div>
@@ -86,7 +86,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
 
       {/* Brands */}
       <div>
-        <h3 className="font-display text-sm font-semibold text-text-dominant uppercase tracking-wider mb-4">
+        <h3 className="font-display text-sm font-semibold text-[#FDD26E] uppercase tracking-wider mb-4">
           Merek
         </h3>
         <div className="space-y-3">
@@ -96,9 +96,9 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
                 type="checkbox"
                 checked={selectedBrands.includes(brand)}
                 onChange={() => handleBrandChange(brand)}
-                className="h-4 w-4 rounded border-surface-light text-primary focus:ring-primary"
+                className="h-4 w-4 rounded border-white/10 bg-[#161616] text-[#FDD26E] focus:ring-[#FDD26E] accent-[#FDD26E]"
               />
-              <span className="font-text text-sm text-text-secondary">{brand}</span>
+              <span className="font-text text-sm text-white/70 hover:text-white transition-colors">{brand}</span>
             </label>
           ))}
         </div>
@@ -106,7 +106,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
 
       {/* Types */}
       <div>
-        <h3 className="font-display text-sm font-semibold text-text-dominant uppercase tracking-wider mb-4">
+        <h3 className="font-display text-sm font-semibold text-[#FDD26E] uppercase tracking-wider mb-4">
           Kategori
         </h3>
         <div className="space-y-3">
@@ -116,9 +116,9 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
                 type="checkbox"
                 checked={selectedTypes.includes(type)}
                 onChange={() => handleTypeChange(type)}
-                className="h-4 w-4 rounded border-surface-light text-primary focus:ring-primary"
+                className="h-4 w-4 rounded border-white/10 bg-[#161616] text-[#FDD26E] focus:ring-[#FDD26E] accent-[#FDD26E]"
               />
-              <span className="font-text text-sm text-text-secondary">{type}</span>
+              <span className="font-text text-sm text-white/70 hover:text-white transition-colors">{type}</span>
             </label>
           ))}
         </div>
@@ -126,7 +126,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
 
       {/* Price Range */}
       <div>
-        <h3 className="font-display text-sm font-semibold text-text-dominant uppercase tracking-wider mb-4">
+        <h3 className="font-display text-sm font-semibold text-[#FDD26E] uppercase tracking-wider mb-4">
           Harga (per hari)
         </h3>
         <div className="flex items-center gap-2">
@@ -135,24 +135,24 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
             placeholder="Min"
-            className="w-full rounded-input border border-surface-light px-3 py-2 font-text text-sm focus:border-primary focus:outline-none"
+            className="w-full rounded-input border border-white/10 bg-[#161616] px-3 py-2 font-text text-sm text-white focus:border-[#FDD26E] focus:outline-none"
           />
-          <span className="text-text-tertiary">-</span>
+          <span className="text-white/50">-</span>
           <input
             type="number"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
             placeholder="Max"
-            className="w-full rounded-input border border-surface-light px-3 py-2 font-text text-sm focus:border-primary focus:outline-none"
+            className="w-full rounded-input border border-white/10 bg-[#161616] px-3 py-2 font-text text-sm text-white focus:border-[#FDD26E] focus:outline-none"
           />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col gap-3 pt-4 border-t border-surface-light">
+      <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
         <button
           onClick={applyFilters}
-          className="w-full h-touch bg-primary hover:bg-primary-hover active:bg-primary-press text-white font-text rounded-button transition-colors"
+          className="w-full h-touch bg-[#FDD26E] hover:bg-[#FED590] active:bg-[#FCC840] text-[#332A16] font-text rounded-full transition-colors font-semibold cursor-pointer"
         >
           Terapkan Filter
         </button>
@@ -163,7 +163,7 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
           maxPrice) && (
           <button
             onClick={clearFilters}
-            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-text text-text-tertiary hover:text-text-dominant transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-text text-white/50 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
             Hapus Filter
