@@ -315,7 +315,7 @@ export default async function Home() {
                   ))}
                 </div>
                 <blockquote className="mt-6 font-text text-lg leading-8 text-white/80">
-                  "{testimonial.quote}"
+                  {testimonial.quote}
                 </blockquote>
                 <figcaption className="mt-6">
                   <p className="font-display text-lg font-semibold text-white">{testimonial.name}</p>
