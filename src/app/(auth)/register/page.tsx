@@ -102,6 +102,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full h-touch px-4 font-text text-text-dominant bg-white border border-black/15 rounded-input focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10 transition-colors"
               placeholder="••••••••"
             />

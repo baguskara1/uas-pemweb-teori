@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { CancelBookingButton } from '@/components/dashboard/CancelBookingButton';
+import { PayNowButton } from '@/components/dashboard/PayNowButton';
 import { createClient } from '@/lib/supabase/server';
 
 type PageProps = {
@@ -190,6 +191,15 @@ export default async function BookingDetailPage({ params }: PageProps) {
         {booking.status === 'pending' && (
           <div className="flex justify-end">
             <CancelBookingButton bookingId={booking.id} />
+          </div>
+        )}
+        {booking.status === 'confirmed' && (
+          <div className="flex flex-col items-end gap-4">
+            <div className="text-right">
+              <p className="text-sm text-text-tertiary mb-1">Booking telah dikonfirmasi</p>
+              <p className="text-xs text-text-tertiary">Selesaikan pembayaran untuk mengaktifkan sewa</p>
+            </div>
+            <PayNowButton bookingId={booking.id} />
           </div>
         )}
       </div>

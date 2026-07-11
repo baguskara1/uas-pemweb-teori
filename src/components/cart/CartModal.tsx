@@ -3,8 +3,8 @@
 import { CalendarDays, Loader2, ShoppingCart, Trash2, Wallet, X } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/components/shared/Toast';
+import { useCart } from '@/contexts/CartContext';
 import { PAYMENT_METHODS } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 
@@ -288,7 +288,7 @@ export function CartModal({ open, onClose }: CartModalProps) {
                       onClick={() => {
                         removeItem(item.id);
                         show(`${item.name} dihapus dari keranjang`, 'info');
-                      }}                      
+                      }}
                       className="text-red-500 hover:text-red-700 transition-colors p-1 shrink-0"
                       aria-label={`Hapus ${item.name} dari keranjang`}
                     >
@@ -411,11 +411,15 @@ export function CartModal({ open, onClose }: CartModalProps) {
               disabled={!canCheckout}
               className="w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-full font-text font-semibold transition-colors disabled:bg-surface-light disabled:text-text-tertiary disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Memproses...</>
-                : durationDays > 0
-                  ? `Bayar ${formatCurrency(totals.subtotal)}`
-                  : 'Atur jadwal sewa terlebih dahulu'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Memproses...
+                </>
+              ) : durationDays > 0 ? (
+                `Bayar ${formatCurrency(totals.subtotal)}`
+              ) : (
+                'Atur jadwal sewa terlebih dahulu'
+              )}
             </button>
           </div>
         )}

@@ -13,7 +13,9 @@ export default async function CheckoutPage(props: { params: Promise<{ cameraId: 
 
   const { data: camera, error } = await supabase
     .from('cameras')
-    .select('id, name, brand, type, category, description, price_per_day, stock, is_available, image_url')
+    .select(
+      'id, name, brand, type, category, description, price_per_day, stock, is_available, image_url',
+    )
     .eq('id', cameraId)
     .single();
 

@@ -55,6 +55,7 @@ export default function CartPage() {
     setLoading(true);
 
     try {
+      const firstItemDates = items[0] ? dates[items[0].id] : null;
       const res = await fetch('/api/payments/midtrans/multi-submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,6 +66,8 @@ export default function CartPage() {
             end_date: dates[item.id].end,
             duration: calcDuration(dates[item.id].start, dates[item.id].end),
           })),
+          start_date: firstItemDates?.start || '',
+          end_date: firstItemDates?.end || '',
         }),
       });
 
@@ -87,10 +90,13 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-24 bg-white">
-        <div className="mx-auto max-w-container px-4 py-16 text-center">
+      <div className="min-h-screen bg-white">
+        <div className="mx-auto max-w-container px-4 py-12 text-center">
           <ShoppingCart className="w-16 h-16 text-black/20 mx-auto mb-4" />
-          <h1 className="font-display text-3xl font-semibold mb-2">Keranjang Kosong</h1>
+          <h1 className="font-display text-3xl font-semibold mb-2">
+            <ShoppingCart className="w-7 h-7 text-primary inline-block mr-2 -mt-1 align-middle" />
+            Keranjang Kosong
+          </h1>
           <p className="font-text text-text-tertiary mb-8">
             Belum ada item yang ditambahkan ke keranjang.
           </p>
@@ -108,14 +114,17 @@ export default function CartPage() {
   const formatCurrency = (v: number) => `Rp ${Math.round(v).toLocaleString('id-ID')}`;
 
   return (
-    <div className="min-h-screen pt-24 bg-white">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="font-display text-3xl font-semibold">Keranjang</h1>
-            <p className="font-text text-text-tertiary text-sm mt-1">
-              {items.length} item — atur jadwal sewa masing-masing
-            </p>
+          <div className="flex items-center gap-3">
+            <ShoppingCart className="w-7 h-7 text-primary" />
+            <div>
+              <h1 className="font-display text-3xl font-semibold">Keranjang</h1>
+              <p className="font-text text-text-tertiary text-sm mt-1">
+                {items.length} item — atur jadwal sewa masing-masing
+              </p>
+            </div>
           </div>
           <button
             onClick={clearCart}
@@ -164,7 +173,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex flex-col sm:items-end gap-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                       <div>
                         <label className="block text-[10px] font-semibold text-text-tertiary uppercase mb-1">
                           Mulai
@@ -174,7 +183,7 @@ export default function CartPage() {
                           value={d.start}
                           min={today}
                           onChange={(e) => updateDate(item.id, 'start', e.target.value)}
-                          className="w-36 border border-black/15 rounded-xl px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                          className="w-full sm:w-36 border border-black/15 rounded-xl px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                         />
                       </div>
                       <div>
@@ -186,7 +195,7 @@ export default function CartPage() {
                           value={d.end}
                           min={d.start || today}
                           onChange={(e) => updateDate(item.id, 'end', e.target.value)}
-                          className="w-36 border border-black/15 rounded-xl px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                          className="w-full sm:w-36 border border-black/15 rounded-xl px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                         />
                       </div>
                     </div>

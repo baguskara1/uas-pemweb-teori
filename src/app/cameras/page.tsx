@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { CameraCard } from '@/components/cameras/CameraCard';
 import { CamerasRealtimeProvider } from '@/components/cameras/CamerasRealtimeProvider';
 import { FilterSidebar } from '@/components/cameras/FilterSidebar';
+import { MobileFilterToggle } from '@/components/cameras/MobileFilterToggle';
 import { createClient } from '@/lib/supabase/server';
 
 type SearchParams = Promise<{
@@ -48,7 +49,12 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
   const types = Array.from(new Set(allCamerasForMeta?.map((c) => c.type) || [])).sort();
 
   // Build query
-  let query = supabase.from('cameras').select('id, name, brand, type, category, price_per_day, image_url, is_available, stock', { count: 'exact' }).eq('is_available', true);
+  let query = supabase
+    .from('cameras')
+    .select('id, name, brand, type, category, price_per_day, image_url, is_available, stock', {
+      count: 'exact',
+    })
+    .eq('is_available', true);
 
   if (category) {
     query = query.eq('category', category);
@@ -107,9 +113,14 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
             </p>
           </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 items-start">
-            {/* Sidebar */}
-            <aside className="lg:sticky lg:top-24">
+          {/* Mobile filter toggle */}
+          <div className="mb-6">
+            <MobileFilterToggle brands={brands} types={types} defaultCategory={category} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-10 items-start">
+            {/* Sidebar — hidden on mobile */}
+            <aside className="hidden lg:block lg:sticky lg:top-24">
               <FilterSidebar brands={brands} types={types} defaultCategory={category} />
             </aside>
 

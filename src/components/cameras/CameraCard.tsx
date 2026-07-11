@@ -1,10 +1,13 @@
 'use client';
 
-import { Camera, ShoppingCart } from 'lucide-react';
+import { Camera, Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/components/shared/Toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { addToWishlist, removeFromWishlist } from '@/lib/wishlist';
 import { formatCurrency } from '@/lib/utils';
 
 type CameraCardProps = {
@@ -22,9 +25,64 @@ type CameraCardProps = {
 };
 
 export function CameraCard({ camera }: CameraCardProps) {
+  const { user } = useAuth();
   const { addItem, items } = useCart();
   const { show } = useToast();
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   const inCart = items.some((i) => i.id === camera.id);
+
+  const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const key = `wishlist:${camera.id}`;
+    const cached = sessionStorage.getItem(key);
+    if (cached) {
+      setWishlisted(cached === 'true');
+      fetchedRef.current = true;
+      return;
+    }
+    if (fetchedRef.current) return;
+    fetch('/api/wishlist')
+      .then((r) => r.json())
+      .then((d) => {
+        const listed = d.data?.some((i: { camera_id: string }) => i.camera_id === camera.id) ?? false;
+        setWishlisted(listed);
+        fetchedRef.current = true;
+        sessionStorage.setItem(key, String(listed));
+      })
+      .catch(() => {
+        fetchedRef.current = true;
+      });
+  }, [user, camera.id]);
+
+  const handleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      show('Login dulu untuk wishlist', 'info');
+      return;
+    }
+    setWishlistLoading(true);
+    try {
+      if (wishlisted) {
+        await removeFromWishlist(camera.id);
+        setWishlisted(false);
+        sessionStorage.setItem(`wishlist:${camera.id}`, 'false');
+        show('Dihapus dari Wishlist', 'info');
+      } else {
+        await addToWishlist(camera.id);
+        setWishlisted(true);
+        sessionStorage.setItem(`wishlist:${camera.id}`, 'true');
+        show('Ditambahkan ke Wishlist', 'success');
+      }
+    } catch (err) {
+      console.error('[Wishlist] Error:', err);
+      show('Gagal memperbarui wishlist', 'error');
+    }
+    setWishlistLoading(false);
+  };
 
   const categoryLabel =
     camera.category === 'lens' ? 'Lensa' : camera.category === 'accessory' ? 'Aksesoris' : 'Kamera';
@@ -81,6 +139,18 @@ export function CameraCard({ camera }: CameraCardProps) {
             {camera.is_available && camera.stock > 0 ? 'Tersedia' : 'Habis'}
           </span>
         </div>
+        <button
+          type="button"
+          onClick={handleWishlist}
+          disabled={wishlistLoading}
+          className={`absolute bottom-3 right-3 p-2 rounded-full backdrop-blur-sm shadow transition-all ${
+            wishlisted
+              ? 'bg-primary text-white'
+              : 'bg-black/50 hover:bg-black/80 text-white'
+          }`}
+        >
+          <Heart className={`w-4 h-4 ${wishlisted ? 'fill-current' : ''}`} />
+        </button>
       </div>
 
       <div className="flex flex-col flex-1 p-5">

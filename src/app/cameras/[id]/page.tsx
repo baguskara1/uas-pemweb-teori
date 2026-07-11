@@ -19,7 +19,9 @@ export default async function CameraDetailPage(props: { params: Promise<{ id: st
 
   const { data: camera, error } = await supabase
     .from('cameras')
-    .select('id, name, brand, type, category, description, price_per_day, stock, is_available, image_url')
+    .select(
+      'id, name, brand, type, category, description, price_per_day, stock, is_available, image_url',
+    )
     .eq('id', id)
     .single();
 

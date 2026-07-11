@@ -16,6 +16,7 @@ export function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
 
   return (
+    <>
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/10">
       <div className="max-w-container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-touch">
@@ -203,9 +204,10 @@ export function Navbar() {
           </div>
         )}
       </div>
-
-      <WishlistDrawer open={wishlistOpen} onClose={() => setWishlistOpen(false)} />
-      <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
     </nav>
+
+    <WishlistDrawer open={wishlistOpen} onClose={() => setWishlistOpen(false)} />
+    <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
+    </>
   );
 }

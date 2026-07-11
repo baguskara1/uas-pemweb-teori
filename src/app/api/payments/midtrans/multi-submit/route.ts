@@ -12,8 +12,9 @@ function isValidUUID(str: string): boolean {
 }
 
 function isValidISODate(str: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}/.test(str)) return false;
   const date = new Date(str);
-  return date instanceof Date && !Number.isNaN(date.getTime()) && date.toISOString() === str;
+  return date instanceof Date && !Number.isNaN(date.getTime());
 }
 
 function isTodayOrLater(dateStr: string): boolean {
@@ -163,12 +164,14 @@ async function handler(request: NextRequest) {
 
     for (const item of items) {
       const cam = cameras.find((c) => c.id === item.id)!;
+      const itemStart = item.start_date || start_date;
+      const itemEnd = item.end_date || end_date;
       const { data: bookingData, error: bookingError } = await supabase.rpc(
         'create_booking_with_loyalty',
         {
           p_camera_id: item.id,
-          p_start_date: start_date,
-          p_end_date: end_date,
+          p_start_date: itemStart,
+          p_end_date: itemEnd,
           p_duration: item.duration,
           p_total_price: cam.price_per_day * item.duration,
         },
@@ -205,8 +208,7 @@ async function handler(request: NextRequest) {
     await supabase.from('bookings').update({ order_group: orderGroup }).in('id', bookingIds);
 
     // Create a single payment
-    const timestamp = Date.now();
-    const orderId = `camera-rental-multi-${orderGroup.slice(0, 8)}-${timestamp}`;
+    const orderId = `CR-M${orderGroup.slice(0, 8)}-${Date.now()}`;
 
     const { data: profile } = await supabase
       .from('profiles')

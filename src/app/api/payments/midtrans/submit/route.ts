@@ -54,7 +54,7 @@ async function handler(request: NextRequest) {
       );
     }
 
-    if (booking.status !== 'pending') {
+    if (booking.status !== 'pending' && booking.status !== 'confirmed') {
       return NextResponse.json(
         {
           success: false,
@@ -78,8 +78,7 @@ async function handler(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    const timestamp = Date.now();
-    const orderId = `camera-rental-${booking.id}-${timestamp}`;
+    const orderId = `CR-${booking.id.slice(0, 8)}-${Date.now()}`;
 
     // Create payment record — schema columns
     const { data: payment, error: paymentError } = await supabase

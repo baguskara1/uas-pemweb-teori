@@ -17,14 +17,12 @@ export function HeroCamera() {
         }}
       />
 
-      <div className="hero-float relative">
+      <div className="hero-float relative w-full max-w-[380px] mx-auto">
         <svg
-          width="380"
-          height="280"
           viewBox="0 0 380 280"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="drop-shadow-[0_35px_90px_rgba(0,0,0,0.18)]"
+          className="w-full h-auto drop-shadow-[0_35px_90px_rgba(0,0,0,0.18)]"
         >
           <defs>
             <linearGradient

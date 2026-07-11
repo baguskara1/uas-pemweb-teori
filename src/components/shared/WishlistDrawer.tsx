@@ -44,7 +44,7 @@ export function WishlistDrawer({ open, onClose }: { open: boolean; onClose: () =
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm">
           <div
             className="absolute inset-0"
             onClick={onClose}
@@ -52,8 +52,9 @@ export function WishlistDrawer({ open, onClose }: { open: boolean; onClose: () =
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && onClose()}
           />
-          <div className="relative w-full max-w-md h-full bg-white shadow-2xl p-6 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
+          {/* Mobile: bottom sheet; Desktop: side drawer */}
+          <div className="absolute bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:top-0 md:right-0 md:w-full md:max-w-md md:h-full bg-white shadow-2xl overflow-y-auto rounded-t-3xl md:rounded-none">
+            <div className="sticky top-0 bg-white border-b border-black/10 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Heart className="w-5 h-5 text-red-500 fill-current" />
                 <h3 className="font-display text-lg font-semibold">Wishlist Saya</h3>
@@ -67,55 +68,57 @@ export function WishlistDrawer({ open, onClose }: { open: boolean; onClose: () =
               </button>
             </div>
 
-            {loading ? (
-              <div className="text-center py-12 text-text-tertiary">Memuat...</div>
-            ) : items.length === 0 ? (
-              <div className="text-center py-12 space-y-4">
-                <Heart className="w-12 h-12 text-black/20 mx-auto" />
-                <p className="text-text-tertiary">Wishlist Anda kosong.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex gap-4 p-3 rounded-xl bg-surface-dark border border-black/10"
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-surface-light shrink-0">
-                      {item.camera?.image_url ? (
-                        <img
-                          src={item.camera.image_url}
-                          alt={item.camera.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="grid h-full place-items-center">
-                          <Camera className="w-6 h-6 text-text-tertiary" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-text-tertiary uppercase tracking-wider">
-                        {item.camera?.brand}
-                      </p>
-                      <h4 className="font-display text-sm font-semibold truncate">
-                        {item.camera?.name}
-                      </h4>
-                      <p className="text-xs text-primary font-semibold mt-1">
-                        Rp {(item.camera?.price_per_day ?? 0).toLocaleString('id-ID')} / hari
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(item.camera_id)}
-                      className="text-text-tertiary hover:text-red-500 p-1 shrink-0"
+            <div className="p-6">
+              {loading ? (
+                <div className="text-center py-12 text-text-tertiary">Memuat...</div>
+              ) : items.length === 0 ? (
+                <div className="text-center py-12 space-y-4">
+                  <Heart className="w-12 h-12 text-black/20 mx-auto" />
+                  <p className="text-text-tertiary">Wishlist Anda kosong.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex gap-4 p-3 rounded-xl bg-surface-dark border border-black/10"
                     >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-surface-light shrink-0">
+                        {item.camera?.image_url ? (
+                          <img
+                            src={item.camera.image_url}
+                            alt={item.camera.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="grid h-full place-items-center">
+                            <Camera className="w-6 h-6 text-text-tertiary" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-text-tertiary uppercase tracking-wider">
+                          {item.camera?.brand}
+                        </p>
+                        <h4 className="font-display text-sm font-semibold truncate">
+                          {item.camera?.name}
+                        </h4>
+                        <p className="text-xs text-primary font-semibold mt-1">
+                          Rp {(item.camera?.price_per_day ?? 0).toLocaleString('id-ID')} / hari
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(item.camera_id)}
+                        className="text-text-tertiary hover:text-red-500 p-1 shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

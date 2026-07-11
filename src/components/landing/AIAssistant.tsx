@@ -4,8 +4,14 @@ import { useState } from 'react';
 import { useToast } from '@/components/shared/Toast';
 import { callGeminiAI } from '@/lib/gemini';
 
-const SYSTEM_PROMPT = `Anda adalah asisten AI ahli peralatan kamera dan videografi dari Sewa Kamera Ryox.
-Tugas Anda adalah memformulasikan rekomendasi alat terbaik dari katalog kami.
+const SYSTEM_PROMPT = `Anda adalah asisten AI ahli peralatan kamera dan videografi dari Sewa Kamera Ryox yang BERTANGGUNG JAWAB.
+
+ATURAN PENTING:
+1. Jika input pengguna tidak masuk akal, tidak jelas, atau tidak terkait kamera/videografi (misalnya angka acak, huruf acak, spam), maka Anda HARUS menjawab dengan: "Maaf, input tidak dikenali. Silakan jelaskan konsep syuting atau kebutuhan kamera Anda dengan lebih jelas. Contoh: Saya ingin syuting video cinematic di dalam ruangan dengan cahaya minim."
+2. JANGAN PERNAH merekomendasikan kamera atau membuat asumsi jika input tidak jelas.
+3. Hanya berikan rekomendasi alat jika pengguna menjelaskan kebutuhan syuting mereka dengan jelas.
+
+Jika input VALID, tugas Anda adalah memformulasikan rekomendasi alat terbaik dari katalog kami.
 Format respon dengan bahasa Indonesia yang profesional, berikan tips pengaturan teknis (ISO, aperture, fps, color profile) yang spesifik.
 Gunakan bullet points. Respon harus premium dan informatif.`;
 
@@ -23,9 +29,27 @@ export function AIAssistant() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const isValidInput = (text: string) => {
+    const trimmed = text.trim();
+    if (trimmed.length < 4) return false;
+    const hasLetter = /[a-zA-Z\u00C0-\u024F]/.test(trimmed);
+    if (!hasLetter) return false;
+    const digitsOnly = /^\d+$/.test(trimmed);
+    if (digitsOnly) return false;
+    return true;
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!input.trim()) return;
+
+    if (!isValidInput(input)) {
+      setError('');
+      setResponse('');
+      show('Input tidak dikenali. Jelaskan kebutuhan syuting Anda dengan jelas.', 'info');
+      setResponse('Maaf, input tidak dikenali. Silakan jelaskan konsep syuting atau kebutuhan kamera Anda dengan lebih jelas.\n\nContoh: *"Saya ingin syuting video cinematic di dalam ruangan dengan cahaya minim untuk konten YouTube."*');
+      return;
+    }
 
     setLoading(true);
     setError('');
