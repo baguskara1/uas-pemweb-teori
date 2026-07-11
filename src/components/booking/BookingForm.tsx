@@ -1,11 +1,12 @@
 'use client';
 
-import { DatePicker } from '@/components/booking/DatePicker';
-import { useAuth } from '@/contexts/AuthContext';
 import { Calendar, Loader2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { createBooking } from '@/actions/booking';
+import { DatePicker } from '@/components/booking/DatePicker';
+import { useAuth } from '@/contexts/AuthContext';
+import { formatCurrency } from '@/lib/utils';
 
 type Camera = {
   id: string;
@@ -44,14 +45,6 @@ export function BookingForm({ camera }: BookingFormProps) {
   }, [startDate, endDate]);
 
   const totalPrice = durationDays * camera.price_per_day;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('id-ID', {

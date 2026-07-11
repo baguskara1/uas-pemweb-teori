@@ -1,7 +1,11 @@
 'use client';
 
-import { Camera } from 'lucide-react';
+import { Camera, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useToast } from '@/components/shared/Toast';
+import { useCart } from '@/contexts/CartContext';
+import { formatCurrency } from '@/lib/utils';
 
 type CameraCardProps = {
   camera: {
@@ -9,6 +13,7 @@ type CameraCardProps = {
     name: string;
     brand: string;
     type: string;
+    category: string;
     price_per_day: number;
     image_url: string | null;
     is_available: boolean;
@@ -17,38 +22,60 @@ type CameraCardProps = {
 };
 
 export function CameraCard({ camera }: CameraCardProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(value);
+  const { addItem, items } = useCart();
+  const { show } = useToast();
+  const inCart = items.some((i) => i.id === camera.id);
+
+  const categoryLabel =
+    camera.category === 'lens' ? 'Lensa' : camera.category === 'accessory' ? 'Aksesoris' : 'Kamera';
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      id: camera.id,
+      name: camera.name,
+      brand: camera.brand,
+      type: camera.type,
+      category: camera.category,
+      image_url: camera.image_url,
+      price_per_day: camera.price_per_day,
+      stock: camera.stock,
+    });
+    show(`${camera.name} ditambahkan ke keranjang`, 'success');
   };
 
   return (
     <Link
       href={`/cameras/${camera.id}`}
-      className="group flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+      className="group flex flex-col bg-white border border-black/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-black/15 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
     >
-      <div className="relative aspect-[4/3] w-full bg-white/5 overflow-hidden">
+      <div className="relative aspect-[4/3] w-full bg-surface-dark overflow-hidden">
         {camera.image_url ? (
-          <img
+          <Image
             src={camera.image_url}
             alt={camera.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
             loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="grid h-full place-items-center bg-gradient-to-br from-white/5 to-transparent">
-            <Camera className="h-12 w-12 text-[#FDD26E]/50" />
+          <div className="grid h-full place-items-center bg-gradient-to-br from-surface-dark to-white">
+            <Camera className="h-12 w-12 text-primary/50" />
           </div>
         )}
+        <div className="absolute top-3 left-3">
+          <span className="bg-black/80 text-primary text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase">
+            {categoryLabel}
+          </span>
+        </div>
         <div className="absolute top-3 right-3">
           <span
             className={`px-3 py-1 font-text text-xs font-semibold rounded-full ${
               camera.is_available && camera.stock > 0
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/25'
-                : 'bg-rose-500/10 text-rose-400 border border-rose-500/25'
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                : 'bg-surface-dark text-text-tertiary border border-black/10'
             }`}
           >
             {camera.is_available && camera.stock > 0 ? 'Tersedia' : 'Habis'}
@@ -57,16 +84,27 @@ export function CameraCard({ camera }: CameraCardProps) {
       </div>
 
       <div className="flex flex-col flex-1 p-5">
-        <p className="font-text text-xs text-white/50 uppercase tracking-wider">
+        <p className="font-text text-xs text-text-tertiary uppercase tracking-wider">
           {camera.brand} · {camera.type}
         </p>
-        <h3 className="mt-2 font-display text-xl font-semibold text-white group-hover:text-[#FDD26E] transition-colors line-clamp-1">
+        <h3 className="mt-2 font-display text-xl font-semibold text-text-dominant group-hover:text-primary transition-colors line-clamp-1">
           {camera.name}
         </h3>
-        <p className="mt-auto pt-4 font-text font-semibold text-[#FDD26E]">
-          {formatCurrency(camera.price_per_day)}{' '}
-          <span className="text-xs font-normal text-white/50">/ hari</span>
-        </p>
+        <div className="mt-auto pt-4 flex items-center justify-between">
+          <p className="font-text font-semibold text-primary">
+            {formatCurrency(camera.price_per_day)}{' '}
+            <span className="text-xs font-normal text-text-tertiary">/ hari</span>
+          </p>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!camera.is_available || camera.stock <= 0 || inCart}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ShoppingCart className="w-3.5 h-3.5" />
+            {inCart ? 'Di Keranjang' : 'Tambah'}
+          </button>
+        </div>
       </div>
     </Link>
   );

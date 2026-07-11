@@ -16,9 +16,9 @@ export function DashboardSidebar() {
   ];
 
   return (
-    <aside className="w-64 border-r border-surface-light bg-white p-6 flex flex-col">
+    <aside className="w-64 border-r border-black/10 bg-white p-6 flex flex-col">
       <div className="mb-10">
-        <Link href="/" className="font-display text-xl font-bold text-primary">
+        <Link href="/" className="font-display text-xl font-bold text-text-dominant">
           Sewa Kamera Ryox
         </Link>
       </div>
@@ -32,8 +32,8 @@ export function DashboardSidebar() {
               href={link.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl font-text text-sm transition-colors ${
                 isActive
-                  ? 'bg-primary/10 text-primary font-semibold'
-                  : 'text-text-secondary hover:bg-surface-light/50'
+                  ? 'bg-surface-light text-text-dominant font-semibold'
+                  : 'text-text-tertiary hover:bg-surface-light hover:text-text-dominant'
               }`}
             >
               <link.icon className="h-5 w-5" />

@@ -1,8 +1,9 @@
-import { BookingForm } from '@/components/booking/BookingForm';
-import { createClient } from '@/lib/supabase/server';
 import { Camera, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { BookingForm } from '@/components/booking/BookingForm';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function CheckoutPage(props: { params: Promise<{ cameraId: string }> }) {
   const params = await props.params;
@@ -12,7 +13,7 @@ export default async function CheckoutPage(props: { params: Promise<{ cameraId: 
 
   const { data: camera, error } = await supabase
     .from('cameras')
-    .select('*')
+    .select('id, name, brand, type, category, description, price_per_day, stock, is_available, image_url')
     .eq('id', cameraId)
     .single();
 
@@ -60,9 +61,13 @@ export default async function CheckoutPage(props: { params: Promise<{ cameraId: 
             <div className="flex gap-4 mb-6">
               <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white shrink-0 border border-surface-light">
                 {camera.image_url ? (
-                  <img
+                  <Image
                     src={camera.image_url}
                     alt={camera.name}
+                    width={80}
+                    height={80}
+                    loading="lazy"
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (

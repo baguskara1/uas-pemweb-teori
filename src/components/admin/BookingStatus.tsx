@@ -1,9 +1,9 @@
 'use client';
 
-import { updateBookingStatus } from '@/actions/admin-booking';
-import type { BookingStatus } from '@/actions/admin-booking';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import type { BookingStatus } from '@/actions/admin-booking';
+import { updateBookingStatus } from '@/actions/admin-booking';
 
 export const STATUS_LABEL: Record<BookingStatus, string> = {
   pending: 'Menunggu',
@@ -15,12 +15,12 @@ export const STATUS_LABEL: Record<BookingStatus, string> = {
 };
 
 export const STATUS_COLOR: Record<BookingStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  confirmed: 'bg-blue-100 text-blue-700',
-  in_progress: 'bg-purple-100 text-purple-700',
-  returned: 'bg-indigo-100 text-indigo-700',
-  completed: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700',
+  pending: 'bg-primary/10 text-primary',
+  confirmed: 'bg-primary/15 text-primary',
+  in_progress: 'bg-surface-dark text-text-secondary',
+  returned: 'bg-surface-dark text-text-secondary',
+  completed: 'bg-green-50 text-green-700',
+  cancelled: 'bg-red-50 text-red-700',
 };
 
 const ALL_STATUSES: BookingStatus[] = [
@@ -36,7 +36,7 @@ export function StatusBadge({ status }: { status: string }) {
   const s = status as BookingStatus;
   return (
     <span
-      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLOR[s] ?? 'bg-gray-100 text-gray-600'}`}
+      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLOR[s] ?? 'bg-surface-light text-text-tertiary'}`}
     >
       {STATUS_LABEL[s] ?? status}
     </span>
@@ -66,7 +66,7 @@ export function StatusSelect({
       value={current}
       onChange={handleChange}
       disabled={loading}
-      className="border border-surface-light rounded-lg px-3 py-1.5 font-text text-sm bg-white focus:outline-none focus:border-primary disabled:opacity-60"
+      className="border border-black/15 rounded-lg px-3 py-1.5 font-text text-sm bg-white text-text-dominant focus:outline-none focus:border-primary disabled:opacity-60"
     >
       {ALL_STATUSES.map((s) => (
         <option key={s} value={s}>

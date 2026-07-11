@@ -2,49 +2,80 @@
 
 import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { CATEGORY_OPTIONS } from '@/lib/constants';
 
 type FilterSidebarProps = {
   brands: string[];
   types: string[];
+  defaultCategory?: string;
 };
 
-export function FilterSidebar({ brands, types }: FilterSidebarProps) {
+export function FilterSidebar({ brands, types, defaultCategory = '' }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
   const [selectedBrands, setSelectedBrands] = useState<string[]>(searchParams.getAll('brand'));
   const [selectedTypes, setSelectedTypes] = useState<string[]>(searchParams.getAll('type'));
   const [minPrice, setMinPrice] = useState(searchParams.get('min_price') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '');
 
-  const applyFilters = useCallback(() => {
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const pushWith = (
+    search: string,
+    category: string,
+    brands: string[],
+    types: string[],
+    min: string,
+    max: string,
+  ) => {
     const params = new URLSearchParams();
-
     if (search) params.set('q', search);
-    selectedBrands.forEach((b) => params.append('brand', b));
-    selectedTypes.forEach((t) => params.append('type', t));
-    if (minPrice) params.set('min_price', minPrice);
-    if (maxPrice) params.set('max_price', maxPrice);
-
+    if (category) params.set('category', category);
+    brands.forEach((b) => params.append('brand', b));
+    types.forEach((t) => params.append('type', t));
+    if (min) params.set('min_price', min);
+    if (max) params.set('max_price', max);
     router.push(`/cameras?${params.toString()}`, { scroll: false });
-  }, [search, selectedBrands, selectedTypes, minPrice, maxPrice, router]);
+  };
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    pushWith(search, cat, selectedBrands, selectedTypes, minPrice, maxPrice);
+  };
 
   const handleBrandChange = (brand: string) => {
-    setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
-    );
+    const next = selectedBrands.includes(brand)
+      ? selectedBrands.filter((b) => b !== brand)
+      : [...selectedBrands, brand];
+    setSelectedBrands(next);
+    pushWith(search, selectedCategory, next, selectedTypes, minPrice, maxPrice);
   };
 
   const handleTypeChange = (type: string) => {
-    setSelectedTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
-    );
+    const next = selectedTypes.includes(type)
+      ? selectedTypes.filter((t) => t !== type)
+      : [...selectedTypes, type];
+    setSelectedTypes(next);
+    pushWith(search, selectedCategory, selectedBrands, next, minPrice, maxPrice);
+  };
+
+  const handlePriceSearchChange = (nextSearch: string, nextMin: string, nextMax: string) => {
+    setSearch(nextSearch);
+    setMinPrice(nextMin);
+    setMaxPrice(nextMax);
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      pushWith(nextSearch, selectedCategory, selectedBrands, selectedTypes, nextMin, nextMax);
+    }, 400);
   };
 
   const clearFilters = () => {
     setSearch('');
+    setSelectedCategory('');
     setSelectedBrands([]);
     setSelectedTypes([]);
     setMinPrice('');
@@ -52,9 +83,10 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
     router.push('/cameras');
   };
 
-  // Sync state with URL params on back/forward
+  // Sync local state when URL changes externally (e.g. back/forward nav)
   useEffect(() => {
     setSearch(searchParams.get('q') || '');
+    setSelectedCategory(searchParams.get('category') || '');
     setSelectedBrands(searchParams.getAll('brand'));
     setSelectedTypes(searchParams.getAll('type'));
     setMinPrice(searchParams.get('min_price') || '');
@@ -62,31 +94,52 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
   }, [searchParams]);
 
   return (
-    <div className="flex flex-col gap-8 bg-white/5 border border-white/10 p-6 rounded-2xl">
-      {/* Search */}
+    <div className="flex flex-col gap-8 bg-white border border-black/10 p-6 rounded-2xl">
       <div>
         <label htmlFor="search" className="sr-only">
-          Cari kamera
+          Cari produk
         </label>
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-white/50" />
+            <Search className="h-4 w-4 text-text-tertiary" />
           </div>
           <input
             type="text"
             id="search"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-            className="block w-full rounded-input border border-white/10 bg-[#161616] py-2 pl-10 pr-3 font-text text-sm text-white placeholder:text-white/40 focus:border-[#FDD26E] focus:outline-none focus:ring-1 focus:ring-[#FDD26E]"
+            onChange={(e) => {
+              handlePriceSearchChange(e.target.value, minPrice, maxPrice);
+            }}
+            className="block w-full rounded-xl border border-black/15 bg-white py-2 pl-10 pr-3 font-text text-sm text-text-dominant placeholder:text-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="Cari model kamera..."
           />
         </div>
       </div>
 
-      {/* Brands */}
       <div>
-        <h3 className="font-display text-sm font-semibold text-[#FDD26E] uppercase tracking-wider mb-4">
+        <h3 className="font-display text-sm font-semibold text-primary uppercase tracking-wider mb-3">
+          Produk
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {CATEGORY_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => handleCategoryChange(opt.value)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                selectedCategory === opt.value
+                  ? 'bg-primary text-white'
+                  : 'bg-surface-dark text-text-secondary hover:text-primary hover:bg-primary/10'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-display text-sm font-semibold text-primary uppercase tracking-wider mb-4">
           Merek
         </h3>
         <div className="space-y-3">
@@ -96,18 +149,19 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
                 type="checkbox"
                 checked={selectedBrands.includes(brand)}
                 onChange={() => handleBrandChange(brand)}
-                className="h-4 w-4 rounded border-white/10 bg-[#161616] text-[#FDD26E] focus:ring-[#FDD26E] accent-[#FDD26E]"
+                className="h-4 w-4 rounded border-black/20 bg-white text-primary focus:ring-primary accent-primary"
               />
-              <span className="font-text text-sm text-white/70 hover:text-white transition-colors">{brand}</span>
+              <span className="font-text text-sm text-text-secondary hover:text-text-dominant transition-colors">
+                {brand}
+              </span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Types */}
       <div>
-        <h3 className="font-display text-sm font-semibold text-[#FDD26E] uppercase tracking-wider mb-4">
-          Kategori
+        <h3 className="font-display text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+          Tipe
         </h3>
         <div className="space-y-3">
           {types.map((type) => (
@@ -116,54 +170,54 @@ export function FilterSidebar({ brands, types }: FilterSidebarProps) {
                 type="checkbox"
                 checked={selectedTypes.includes(type)}
                 onChange={() => handleTypeChange(type)}
-                className="h-4 w-4 rounded border-white/10 bg-[#161616] text-[#FDD26E] focus:ring-[#FDD26E] accent-[#FDD26E]"
+                className="h-4 w-4 rounded border-black/20 bg-white text-primary focus:ring-primary accent-primary"
               />
-              <span className="font-text text-sm text-white/70 hover:text-white transition-colors">{type}</span>
+              <span className="font-text text-sm text-text-secondary hover:text-text-dominant transition-colors">
+                {type}
+              </span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Price Range */}
       <div>
-        <h3 className="font-display text-sm font-semibold text-[#FDD26E] uppercase tracking-wider mb-4">
+        <h3 className="font-display text-sm font-semibold text-primary uppercase tracking-wider mb-4">
           Harga (per hari)
         </h3>
         <div className="flex items-center gap-2">
           <input
             type="number"
             value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
+            onChange={(e) => {
+              handlePriceSearchChange(search, e.target.value, maxPrice);
+            }}
             placeholder="Min"
-            className="w-full rounded-input border border-white/10 bg-[#161616] px-3 py-2 font-text text-sm text-white focus:border-[#FDD26E] focus:outline-none"
+            className="w-full rounded-xl border border-black/15 bg-white px-3 py-2 font-text text-sm text-text-dominant placeholder:text-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
-          <span className="text-white/50">-</span>
+          <span className="text-text-tertiary">-</span>
           <input
             type="number"
             value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
+            onChange={(e) => {
+              handlePriceSearchChange(search, minPrice, e.target.value);
+            }}
             placeholder="Max"
-            className="w-full rounded-input border border-white/10 bg-[#161616] px-3 py-2 font-text text-sm text-white focus:border-[#FDD26E] focus:outline-none"
+            className="w-full rounded-xl border border-black/15 bg-white px-3 py-2 font-text text-sm text-text-dominant placeholder:text-text-tertiary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
-        <button
-          onClick={applyFilters}
-          className="w-full h-touch bg-[#FDD26E] hover:bg-[#FED590] active:bg-[#FCC840] text-[#332A16] font-text rounded-full transition-colors font-semibold cursor-pointer"
-        >
-          Terapkan Filter
-        </button>
+      <div className="flex flex-col gap-3 pt-4 border-t border-black/10">
         {(search ||
+          selectedCategory ||
           selectedBrands.length > 0 ||
           selectedTypes.length > 0 ||
           minPrice ||
           maxPrice) && (
           <button
             onClick={clearFilters}
-            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-text text-white/50 hover:text-white transition-colors cursor-pointer"
+            type="button"
+            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-text text-text-tertiary hover:text-text-dominant transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
             Hapus Filter

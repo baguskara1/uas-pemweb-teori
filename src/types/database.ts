@@ -18,6 +18,7 @@ export type Database = {
           final_price: number;
           id: string;
           notes: string | null;
+          order_group: string | null;
           start_date: string;
           status: Database['public']['Enums']['booking_status'];
           total_price: number;
@@ -32,6 +33,7 @@ export type Database = {
           final_price: number;
           id?: string;
           notes?: string | null;
+          order_group?: string | null;
           start_date: string;
           status?: Database['public']['Enums']['booking_status'];
           total_price: number;
@@ -46,6 +48,7 @@ export type Database = {
           final_price?: number;
           id?: string;
           notes?: string | null;
+          order_group?: string | null;
           start_date?: string;
           status?: Database['public']['Enums']['booking_status'];
           total_price?: number;
@@ -71,6 +74,7 @@ export type Database = {
       cameras: {
         Row: {
           brand: string;
+          category: string;
           created_at: string;
           description: string | null;
           id: string;
@@ -83,6 +87,7 @@ export type Database = {
         };
         Insert: {
           brand: string;
+          category?: string;
           created_at?: string;
           description?: string | null;
           id?: string;
@@ -95,6 +100,7 @@ export type Database = {
         };
         Update: {
           brand?: string;
+          category?: string;
           created_at?: string;
           description?: string | null;
           id?: string;
@@ -104,6 +110,33 @@ export type Database = {
           price_per_day?: number;
           stock?: number;
           type?: string;
+        };
+        Relationships: [];
+      };
+      faqs: {
+        Row: {
+          answer: string;
+          created_at: string;
+          id: string;
+          is_visible: boolean;
+          question: string;
+          sort_order: number;
+        };
+        Insert: {
+          answer: string;
+          created_at?: string;
+          id?: string;
+          is_visible?: boolean;
+          question: string;
+          sort_order?: number;
+        };
+        Update: {
+          answer?: string;
+          created_at?: string;
+          id?: string;
+          is_visible?: boolean;
+          question?: string;
+          sort_order?: number;
         };
         Relationships: [];
       };
@@ -286,6 +319,71 @@ export type Database = {
         };
         Relationships: [];
       };
+      testimonials: {
+        Row: {
+          avatar_url: string | null;
+          comment: string;
+          created_at: string;
+          id: string;
+          is_visible: boolean;
+          name: string;
+          project: string | null;
+          rating: number;
+          role: string;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          comment: string;
+          created_at?: string;
+          id?: string;
+          is_visible?: boolean;
+          name: string;
+          project?: string | null;
+          rating?: number;
+          role: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          comment?: string;
+          created_at?: string;
+          id?: string;
+          is_visible?: boolean;
+          name?: string;
+          project?: string | null;
+          rating?: number;
+          role?: string;
+        };
+        Relationships: [];
+      };
+      wishlists: {
+        Row: {
+          camera_id: string;
+          created_at: string;
+          id: string;
+          user_id: string;
+        };
+        Insert: {
+          camera_id: string;
+          created_at?: string;
+          id?: string;
+          user_id: string;
+        };
+        Update: {
+          camera_id?: string;
+          created_at?: string;
+          id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'wishlists_camera_id_fkey';
+            columns: ['camera_id'];
+            isOneToOne: false;
+            referencedRelation: 'cameras';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -294,21 +392,26 @@ export type Database = {
       create_booking_with_loyalty: {
         Args: {
           p_camera_id: string;
-          p_start_date: string;
-          p_end_date: string;
           p_duration: number;
+          p_end_date: string;
+          p_start_date: string;
           p_total_price: number;
         };
         Returns: {
           booking_id: string;
-          final_price: number;
           discount_applied: boolean;
+          final_price: number;
         }[];
       };
       is_admin: { Args: never; Returns: boolean };
       update_payment_from_webhook: {
-        Args: { p_order_id: string; p_status: string; p_payload: string; p_paid_at: string };
-        Returns: string | null;
+        Args: {
+          p_order_id: string;
+          p_paid_at: string;
+          p_payload: Json;
+          p_status: string;
+        };
+        Returns: string;
       };
     };
     Enums: {

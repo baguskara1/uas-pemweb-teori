@@ -1,8 +1,8 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
-import { Calendar, Clock, Mail, Phone, User } from 'lucide-react';
+import { Calendar, Mail, Phone, User } from 'lucide-react';
 import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 type UserProfile = {
   id: string;
@@ -33,7 +33,7 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
 
   const supabase = createClient();
 
-  async function fetchUserData() {
+  async function _fetchUserData() {
     const { data: profile } = await supabase
       .from('profiles')
       .select(`id, full_name, email, phone, role, avatar_url, created_at`)
@@ -87,7 +87,7 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
         >
           ← Kembali
         </button>
-        <h1 className="font-display text-3xl font-semibold">Detail Pengguna</h1>
+        <h1 className="font-display text-3xl font-semibold text-text-dominant">Detail Pengguna</h1>
         <p className="font-text text-sm text-text-tertiary mt-1">
           Informasi lengkap dan history booking pengguna
         </p>
@@ -96,29 +96,31 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
       {user && (
         <>
           {/* User Profile Card */}
-          <div className="bg-white rounded-xl border border-surface-light shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-black/10 overflow-hidden">
             <div className="p-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 {user.avatar_url ? (
                   <img
                     src={user.avatar_url}
                     alt={user.full_name}
-                    className="h-24 w-24 rounded-full object-cover border-4 border-[#f5f5f7]"
+                    className="h-24 w-24 rounded-full object-cover border-4 border-surface-light"
                   />
                 ) : (
-                  <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center border-4 border-[#f5f5f7]">
+                  <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center border-4 border-surface-light">
                     <User className="h-10 w-10 text-primary" />
                   </div>
                 )}
                 <div className="flex-1">
-                  <h2 className="font-display text-2xl font-semibold">{user.full_name}</h2>
+                  <h2 className="font-display text-2xl font-semibold text-text-dominant">
+                    {user.full_name}
+                  </h2>
                   <p className="text-text-secondary mt-1">{user.email}</p>
                   <div className="flex items-center gap-3 mt-3">
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                         user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-blue-100 text-blue-700'
+                          ? 'bg-primary/10 text-primary'
+                          : 'bg-surface-dark text-text-secondary'
                       }`}
                     >
                       {user.role === 'admin' ? 'Admin' : 'User'}
@@ -127,33 +129,33 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 pt-6 border-t border-surface-light">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 pt-6 border-t border-black/10">
                 <div className="flex items-start gap-3">
                   <Mail className="h-5 w-5 text-text-tertiary mt-1" />
                   <div>
                     <p className="text-xs text-text-tertiary mb-1">Email</p>
-                    <p className="text-sm font-medium">{user.email}</p>
+                    <p className="text-sm font-medium text-text-dominant">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone className="h-5 w-5 text-text-tertiary mt-1" />
                   <div>
                     <p className="text-xs text-text-tertiary mb-1">Telepon</p>
-                    <p className="text-sm font-medium">{user.phone || '-'}</p>
+                    <p className="text-sm font-medium text-text-dominant">{user.phone || '-'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <User className="h-5 w-5 text-text-tertiary mt-1" />
                   <div>
                     <p className="text-xs text-text-tertiary mb-1">User ID</p>
-                    <p className="text-sm font-medium font-mono">{user.id}</p>
+                    <p className="text-sm font-medium font-mono text-text-dominant">{user.id}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Calendar className="h-5 w-5 text-text-tertiary mt-1" />
                   <div>
                     <p className="text-xs text-text-tertiary mb-1">Didaftarkan</p>
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-text-dominant">
                       {new Date(user.created_at).toLocaleDateString('id-ID', {
                         day: 'numeric',
                         month: 'long',
@@ -168,10 +170,12 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
 
           {/* Bookings History */}
           <div>
-            <h3 className="font-display text-xl font-semibold mb-4">History Peminjaman</h3>
-            <div className="bg-white rounded-xl border border-surface-light shadow-sm overflow-hidden">
+            <h3 className="font-display text-xl font-semibold mb-4 text-text-dominant">
+              History Peminjaman
+            </h3>
+            <div className="bg-white rounded-xl border border-black/10 overflow-hidden">
               <table className="w-full font-text text-sm">
-                <thead className="bg-[#f5f5f7] text-text-tertiary">
+                <thead className="bg-surface-dark text-text-tertiary">
                   <tr>
                     {['Kamera', 'Tanggal Pinjam', 'Durasi', 'Total', 'Status'].map((h) => (
                       <th key={h} className="px-6 py-3 text-left font-semibold">
@@ -180,9 +184,9 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-surface-light">
+                <tbody className="divide-y divide-black/10">
                   {bookings.map((booking) => (
-                    <tr key={booking.id} className="hover:bg-[#f5f5f7]/50 transition-colors">
+                    <tr key={booking.id} className="hover:bg-black/5 transition-colors">
                       <td className="px-6 py-4">
                         <div className="font-medium text-text-dominant">{booking.camera_name}</div>
                         <div className="text-xs text-text-tertiary">
@@ -197,26 +201,22 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
                       </td>
                       <td className="px-6 py-4 text-text-secondary">{booking.duration} hari</td>
                       <td className="px-6 py-4 text-text-secondary">
-                        {new Intl.NumberFormat('id-ID', {
-                          style: 'currency',
-                          currency: 'IDR',
-                          minimumFractionDigits: 0,
-                        }).format(booking.total_price)}
+                        {`Rp ${Math.round(booking.total_price).toLocaleString('id-ID')}`}
                       </td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize ${
                             booking.status === 'confirmed'
-                              ? 'bg-green-100 text-green-700'
+                              ? 'bg-green-50 text-green-700'
                               : booking.status === 'in_progress'
-                                ? 'bg-blue-100 text-blue-700'
+                                ? 'bg-blue-50 text-blue-700'
                                 : booking.status === 'returned'
-                                  ? 'bg-purple-100 text-purple-700'
+                                  ? 'bg-purple-50 text-purple-700'
                                   : booking.status === 'completed'
-                                    ? 'bg-green-100 text-green-700'
+                                    ? 'bg-green-50 text-green-700'
                                     : booking.status === 'cancelled'
-                                      ? 'bg-red-100 text-red-700'
-                                      : 'bg-yellow-100 text-yellow-700'
+                                      ? 'bg-red-50 text-red-700'
+                                      : 'bg-yellow-50 text-yellow-700'
                           }`}
                         >
                           {booking.status.replace('_', ' ')}

@@ -1,8 +1,8 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 /**
  * Subscribes to realtime changes on the bookings table for a given user.

@@ -25,12 +25,7 @@ export function LoyaltyCard({ loyaltyCard, history }: LoyaltyCardProps) {
   const progress = Math.min((currentCount / maxCount) * 100, 100);
   const isReady = currentCount >= maxCount;
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(value);
+  const formatCurrency = (value: number) => `Rp ${Math.round(value).toLocaleString('id-ID')}`;
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString('id-ID', {

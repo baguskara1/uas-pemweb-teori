@@ -1,16 +1,17 @@
-import { createClient } from '@/lib/supabase/server';
 import { Calendar, Camera, ChevronLeft, Clock, CreditCard } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { CancelBookingButton } from '@/components/dashboard/CancelBookingButton';
+import { createClient } from '@/lib/supabase/server';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-  pending: { label: 'Menunggu', color: 'text-yellow-700', bg: 'bg-yellow-100' },
-  confirmed: { label: 'Dikonfirmasi', color: 'text-blue-700', bg: 'bg-blue-100' },
+  pending: { label: 'Menunggu', color: 'text-primary', bg: 'bg-primary/10' },
+  confirmed: { label: 'Dikonfirmasi', color: 'text-primary', bg: 'bg-primary/20' },
   active: { label: 'Aktif', color: 'text-green-700', bg: 'bg-green-100' },
   completed: { label: 'Selesai', color: 'text-gray-700', bg: 'bg-gray-100' },
   cancelled: { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' },
@@ -57,13 +58,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
   const statusStyle = statusConfig[booking.status] || statusConfig.pending;
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const formatCurrency = (value: number) => `Rp ${Math.round(value).toLocaleString('id-ID')}`;
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('id-ID', {
@@ -110,9 +105,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <div className="flex gap-6 mb-8 pb-8 border-b border-surface-light">
           <div className="w-32 h-32 rounded-xl bg-surface-light flex items-center justify-center flex-shrink-0">
             {booking.camera.image_url ? (
-              <img
+              <Image
                 src={booking.camera.image_url}
                 alt={booking.camera.name}
+                width={128}
+                height={128}
+                loading="lazy"
+                unoptimized
                 className="w-full h-full object-cover rounded-xl"
               />
             ) : (

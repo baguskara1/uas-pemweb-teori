@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { generateSnapToken, snapConfig } from '@/lib/midtrans';
+import { withRateLimit } from '@/lib/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 
 /**
  * POST /api/payments/midtrans/submit
  * Create Midtrans transaction and generate Snap token
  */
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const supabase = await createClient();
 
@@ -175,3 +176,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRateLimit(handler);

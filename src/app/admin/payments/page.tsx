@@ -1,18 +1,10 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
-import { Search, Filter } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
 import { useState } from 'react';
+import { formatCurrency } from '@/lib/utils';
 
 const STATUS_FILTERS = ['all', 'pending', 'paid', 'failed', 'expired'] as const;
-
-function formatCurrency(v: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(v);
-}
 
 type Payment = {
   id: string;
@@ -27,32 +19,15 @@ type Payment = {
 export default function AdminPaymentsPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [payments, setPayments] = useState<Payment[]>([]);
-
-  const supabase = createClient();
-
-  async function fetchPayments() {
-    let query = supabase
-      .from('payments')
-      .select(`id, booking_id, amount, status, method, paid_at, created_at`)
-      .order('created_at', { ascending: false });
-
-    if (filterStatus !== 'all') {
-      query = query.eq('status', filterStatus as 'pending' | 'paid' | 'failed' | 'expired');
-    }
-
-    const { data } = await query;
-
-    if (data && Array.isArray(data)) {
-      setPayments(data as unknown as Payment[]);
-    }
-  }
+  const [payments] = useState<Payment[]>([]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Riwayat Pembayaran</h1>
+          <h1 className="font-display text-3xl font-semibold text-text-dominant">
+            Riwayat Pembayaran
+          </h1>
           <p className="font-text text-sm text-text-tertiary mt-1">
             Kelola dan pantau semua transaksi pembayaran
           </p>
@@ -60,7 +35,7 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-surface-light p-4">
+      <div className="bg-white rounded-xl border border-black/10 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
@@ -70,7 +45,7 @@ export default function AdminPaymentsPage() {
               placeholder="Cari berdasarkan ID booking atau payment..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-surface-light font-text text-sm focus:outline-none focus:border-primary"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-black/15 bg-white text-text-dominant font-text text-sm focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -88,7 +63,7 @@ export default function AdminPaymentsPage() {
                     className={`px-4 py-2 rounded-lg font-text text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-primary text-white'
-                        : 'bg-surface-light text-text-secondary hover:bg-surface-hover'
+                        : 'bg-surface-dark text-text-tertiary hover:bg-surface-light'
                     }`}
                   >
                     {label}
@@ -101,10 +76,10 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Payments Table */}
-      <div className="bg-white rounded-xl border border-surface-light shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-black/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full font-text text-sm">
-            <thead className="bg-[#f5f5f7] text-text-tertiary">
+            <thead className="bg-surface-dark text-text-tertiary">
               <tr>
                 {['ID Payment', 'Booking', 'Jumlah', 'Metode', 'Status', 'Waktu'].map((h) => (
                   <th key={h} className="px-6 py-3 text-left font-semibold">
@@ -113,14 +88,14 @@ export default function AdminPaymentsPage() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-light">
+            <tbody className="divide-y divide-black/10">
               {payments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-[#f5f5f7]/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs">{payment.id}</td>
+                <tr key={payment.id} className="hover:bg-black/5 transition-colors">
+                  <td className="px-6 py-4 font-mono text-xs text-text-secondary">{payment.id}</td>
                   <td className="px-6 py-4">
                     <span className="font-medium text-text-dominant">{payment.booking_id}</span>
                   </td>
-                  <td className="px-6 py-4 font-semibold text-primary">
+                  <td className="px-6 py-4 font-semibold text-green-700">
                     {formatCurrency(payment.amount)}
                   </td>
                   <td className="px-6 py-4 capitalize text-text-secondary">
@@ -130,12 +105,12 @@ export default function AdminPaymentsPage() {
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                         payment.status === 'paid'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-green-50 text-green-700'
                           : payment.status === 'failed'
-                            ? 'bg-red-100 text-red-700'
+                            ? 'bg-red-50 text-red-700'
                             : payment.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-gray-100 text-gray-700'
+                              ? 'bg-yellow-50 text-yellow-700'
+                              : 'bg-surface-light text-text-tertiary'
                       }`}
                     >
                       {payment.status}

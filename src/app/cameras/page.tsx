@@ -1,14 +1,15 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import { CameraCard } from '@/components/cameras/CameraCard';
 import { CamerasRealtimeProvider } from '@/components/cameras/CamerasRealtimeProvider';
 import { FilterSidebar } from '@/components/cameras/FilterSidebar';
 import { createClient } from '@/lib/supabase/server';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
 
 type SearchParams = Promise<{
   q?: string;
   brand?: string | string[];
   type?: string | string[];
+  category?: string;
   min_price?: string;
   max_price?: string;
   page?: string;
@@ -30,9 +31,10 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
       ? searchParams.type
       : [searchParams.type]
     : [];
-  const minPrice = searchParams.min_price ? Number.parseInt(searchParams.min_price) : null;
-  const maxPrice = searchParams.max_price ? Number.parseInt(searchParams.max_price) : null;
-  const currentPage = searchParams.page ? Number.parseInt(searchParams.page) : 1;
+  const category = searchParams.category || '';
+  const minPrice = searchParams.min_price ? Number.parseInt(searchParams.min_price, 10) : null;
+  const maxPrice = searchParams.max_price ? Number.parseInt(searchParams.max_price, 10) : null;
+  const currentPage = searchParams.page ? Number.parseInt(searchParams.page, 10) : 1;
 
   const supabase = await createClient();
 
@@ -46,8 +48,11 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
   const types = Array.from(new Set(allCamerasForMeta?.map((c) => c.type) || [])).sort();
 
   // Build query
-  let query = supabase.from('cameras').select('*', { count: 'exact' }).eq('is_available', true);
+  let query = supabase.from('cameras').select('id, name, brand, type, category, price_per_day, image_url, is_available, stock', { count: 'exact' }).eq('is_available', true);
 
+  if (category) {
+    query = query.eq('category', category);
+  }
   if (searchQuery) {
     query = query.ilike('name', `%${searchQuery}%`);
   }
@@ -78,6 +83,7 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
     if (searchQuery) params.set('q', searchQuery);
     brandParams.forEach((b) => params.append('brand', b));
     typeParams.forEach((t) => params.append('type', t));
+    if (category) params.set('category', category);
     if (minPrice !== null) params.set('min_price', minPrice.toString());
     if (maxPrice !== null) params.set('max_price', maxPrice.toString());
     params.set('page', pageNumber.toString());
@@ -86,16 +92,16 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
 
   return (
     <CamerasRealtimeProvider>
-      <div className="bg-[#161616] min-h-screen text-white pt-16">
+      <div className="bg-white min-h-screen text-text-dominant pt-16">
         <div className="mx-auto max-w-container px-4 py-12 sm:px-6 lg:px-8">
           <header className="mb-12">
-            <p className="font-text text-sm font-semibold tracking-[0.18em] text-[#FDD26E] uppercase mb-2">
+            <p className="font-text text-sm font-semibold tracking-[0.18em] text-primary uppercase mb-2">
               Katalog Sewa
             </p>
-            <h1 className="font-display text-4xl font-semibold tracking-[-0.03em] md:text-5xl text-white">
+            <h1 className="font-display text-4xl font-semibold tracking-[-0.03em] md:text-5xl text-text-dominant">
               Pilih Gear Produksi Anda.
             </h1>
-            <p className="mt-4 font-text text-white/60 max-w-xl">
+            <p className="mt-4 font-text text-black/60 max-w-xl">
               Semua kamera siap digunakan dengan kondisi bersih, baterai penuh, dan aksesoris bawaan
               lengkap.
             </p>
@@ -104,7 +110,7 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
           <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 items-start">
             {/* Sidebar */}
             <aside className="lg:sticky lg:top-24">
-              <FilterSidebar brands={brands} types={types} />
+              <FilterSidebar brands={brands} types={types} defaultCategory={category} />
             </aside>
 
             {/* Main Grid */}
@@ -161,7 +167,7 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                               <li>
                                 <Link
                                   href={buildPageUrl(currentPage - 1)}
-                                  className="grid place-items-center h-touch w-10 border border-white/10 rounded-full text-white/75 hover:border-[#FDD26E] hover:text-[#FDD26E] transition-colors"
+                                  className="grid place-items-center h-touch w-10 border border-black/10 rounded-full text-black/60 hover:border-primary hover:text-primary transition-colors"
                                 >
                                   <ChevronLeft className="w-4 h-4" />
                                 </Link>
@@ -175,8 +181,8 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                                     href={buildPageUrl(pageNum)}
                                     className={`grid place-items-center h-touch w-10 rounded-full font-text text-sm transition-colors ${
                                       currentPage === pageNum
-                                        ? 'bg-[#FDD26E] text-[#332A16] font-semibold'
-                                        : 'border border-white/10 text-white/75 hover:border-[#FDD26E] hover:text-[#FDD26E]'
+                                        ? 'bg-primary text-white font-semibold'
+                                        : 'border border-black/10 text-black/60 hover:border-primary hover:text-primary'
                                     }`}
                                   >
                                     {pageNum}
@@ -188,7 +194,7 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                               <li>
                                 <Link
                                   href={buildPageUrl(currentPage + 1)}
-                                  className="grid place-items-center h-touch w-10 border border-white/10 rounded-full text-white/75 hover:border-[#FDD26E] hover:text-[#FDD26E] transition-colors"
+                                  className="grid place-items-center h-touch w-10 border border-black/10 rounded-full text-black/60 hover:border-primary hover:text-primary transition-colors"
                                 >
                                   <ChevronRight className="w-4 h-4" />
                                 </Link>
@@ -201,11 +207,11 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
                   )}
                 </>
               ) : (
-                <div className="border border-dashed border-white/10 p-16 text-center bg-white/5 rounded-2xl">
-                  <h3 className="font-display text-2xl font-semibold mb-2 text-white">
+                <div className="border border-dashed border-black/15 p-16 text-center bg-surface-dark rounded-2xl">
+                  <h3 className="font-display text-2xl font-semibold mb-2 text-text-dominant">
                     Kamera tidak ditemukan
                   </h3>
-                  <p className="font-text text-white/50 max-w-sm mx-auto">
+                  <p className="font-text text-black/40 max-w-sm mx-auto">
                     Coba kurangi filter atau cari kata kunci lain untuk menemukan kamera yang Anda
                     cari.
                   </p>

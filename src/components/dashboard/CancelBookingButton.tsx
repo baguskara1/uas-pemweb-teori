@@ -1,9 +1,9 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
 import { Loader2, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 type CancelBookingButtonProps = {
   bookingId: string;
@@ -59,7 +59,7 @@ export function CancelBookingButton({ bookingId }: CancelBookingButtonProps) {
               <button
                 onClick={() => setShowConfirm(false)}
                 disabled={loading}
-                className="flex-1 h-12 border border-surface-light rounded-full font-semibold hover:bg-surface-light/30 transition-colors"
+                className="flex-1 h-12 border border-black/15 rounded-full font-semibold hover:bg-surface-dark transition-colors"
               >
                 Batal
               </button>

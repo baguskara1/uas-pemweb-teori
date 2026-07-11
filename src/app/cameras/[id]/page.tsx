@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
-import { Camera, CheckCircle2, ChevronLeft, Calendar } from 'lucide-react';
+import { Calendar, Camera, CheckCircle2, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { createClient } from '@/lib/supabase/server';
 
-const Pill = ({ children }: { children: ReactNode }) => (
+const _Pill = ({ children }: { children: ReactNode }) => (
   <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70">
     {children}
   </span>
@@ -17,19 +17,17 @@ export default async function CameraDetailPage(props: { params: Promise<{ id: st
 
   const supabase = await createClient();
 
-  const { data: camera, error } = await supabase.from('cameras').select('*').eq('id', id).single();
+  const { data: camera, error } = await supabase
+    .from('cameras')
+    .select('id, name, brand, type, category, description, price_per_day, stock, is_available, image_url')
+    .eq('id', id)
+    .single();
 
   if (error || !camera) {
     notFound();
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const formatCurrency = (value: number) => `Rp ${Math.round(value).toLocaleString('id-ID')}`;
 
   const isAvailable = camera.is_available && camera.stock > 0;
 
@@ -51,9 +49,12 @@ export default async function CameraDetailPage(props: { params: Promise<{ id: st
           {/* Image Gallery (Simplified to single large image for now per schema, can expand later) */}
           <div className="bg-surface-light rounded-[2rem] overflow-hidden aspect-[4/3] w-full relative">
             {camera.image_url ? (
-              <img
+              <Image
                 src={camera.image_url}
                 alt={camera.name}
+                fill
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
             ) : (

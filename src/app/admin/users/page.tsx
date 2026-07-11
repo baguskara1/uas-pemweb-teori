@@ -1,8 +1,8 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 type User = {
   id: string;
@@ -20,7 +20,7 @@ export default function AdminUsersPage() {
 
   const supabase = createClient();
 
-  async function fetchUsers() {
+  async function _fetchUsers() {
     let query = supabase
       .from('profiles')
       .select(`id, full_name, email, phone, role, avatar_url, created_at`)
@@ -41,7 +41,9 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Manajemen Pengguna</h1>
+          <h1 className="font-display text-3xl font-semibold text-text-dominant">
+            Manajemen Pengguna
+          </h1>
           <p className="font-text text-sm text-text-tertiary mt-1">
             Kelola dan pantau semua pengguna sistem
           </p>
@@ -49,7 +51,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl border border-surface-light p-4">
+      <div className="bg-white rounded-xl border border-black/10 p-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary" />
           <input
@@ -57,16 +59,16 @@ export default function AdminUsersPage() {
             placeholder="Cari berdasarkan nama atau email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-surface-light font-text text-sm focus:outline-none focus:border-primary"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-black/15 bg-white text-text-dominant font-text text-sm focus:outline-none focus:border-primary"
           />
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl border border-surface-light shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-black/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full font-text text-sm">
-            <thead className="bg-[#f5f5f7] text-text-tertiary">
+            <thead className="bg-surface-dark text-text-tertiary">
               <tr>
                 {['Nama', 'Email', 'Telepon', 'Role', 'Didaftarkan'].map((h) => (
                   <th key={h} className="px-6 py-3 text-left font-semibold">
@@ -75,9 +77,9 @@ export default function AdminUsersPage() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-light">
+            <tbody className="divide-y divide-black/10">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-[#f5f5f7]/50 transition-colors">
+                <tr key={user.id} className="hover:bg-black/5 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {user.avatar_url ? (
@@ -87,7 +89,7 @@ export default function AdminUsersPage() {
                           className="h-10 w-10 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
                           <span className="font-medium text-primary">
                             {user.full_name.charAt(0).toUpperCase()}
                           </span>
@@ -105,8 +107,8 @@ export default function AdminUsersPage() {
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                         user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-blue-100 text-blue-700'
+                          ? 'bg-primary/10 text-primary'
+                          : 'bg-surface-dark text-text-secondary'
                       }`}
                     >
                       {user.role === 'admin' ? 'Admin' : 'User'}

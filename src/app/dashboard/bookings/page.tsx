@@ -1,8 +1,9 @@
-import { BookingsRealtimeProvider } from '@/components/dashboard/BookingsRealtimeProvider';
-import { BookingCard } from '@/components/dashboard/BookingCard';
-import { createClient } from '@/lib/supabase/server';
 import { Calendar } from 'lucide-react';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { BookingCard } from '@/components/dashboard/BookingCard';
+import { BookingsRealtimeProvider } from '@/components/dashboard/BookingsRealtimeProvider';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function BookingsPage() {
   const supabase = await createClient();
@@ -43,7 +44,7 @@ export default async function BookingsPage() {
 
   return (
     <BookingsRealtimeProvider userId={user.id}>
-      <div className="space-y-6 text-white">
+      <div className="space-y-6 text-text-dominant">
         <div className="flex justify-between items-center">
           <h1 className="font-display text-3xl font-semibold">Booking Saya</h1>
         </div>
@@ -55,16 +56,16 @@ export default async function BookingsPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-            <Calendar className="w-16 h-16 mx-auto mb-4 text-white/30" />
+          <div className="text-center py-16 bg-white rounded-2xl border border-black/10">
+            <Calendar className="w-16 h-16 mx-auto mb-4 text-black/20" />
             <h3 className="font-display text-xl font-semibold mb-2">Belum Ada Booking</h3>
-            <p className="text-white/50 mb-6">Anda belum pernah melakukan booking kamera</p>
-            <a
+            <p className="text-text-tertiary mb-6">Anda belum pernah melakukan booking kamera</p>
+            <Link
               href="/cameras"
-              className="inline-block bg-[#FDD26E] text-[#332A16] px-6 py-3 rounded-full font-semibold hover:bg-[#FED590] transition-colors"
+              className="inline-block bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-hover transition-colors"
             >
               Jelajahi Kamera
-            </a>
+            </Link>
           </div>
         )}
       </div>

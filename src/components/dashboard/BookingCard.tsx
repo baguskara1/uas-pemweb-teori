@@ -1,6 +1,7 @@
 'use client';
 
 import { Calendar, Camera } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type BookingCardProps = {
@@ -20,23 +21,17 @@ type BookingCardProps = {
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-  pending: { label: 'Menunggu', color: 'text-yellow-700', bg: 'bg-yellow-100' },
-  confirmed: { label: 'Dikonfirmasi', color: 'text-blue-700', bg: 'bg-blue-100' },
+  pending: { label: 'Menunggu', color: 'text-primary', bg: 'bg-primary/10' },
+  confirmed: { label: 'Dikonfirmasi', color: 'text-primary', bg: 'bg-primary/20' },
   active: { label: 'Aktif', color: 'text-green-700', bg: 'bg-green-100' },
-  completed: { label: 'Selesai', color: 'text-gray-700', bg: 'bg-gray-100' },
+  completed: { label: 'Selesai', color: 'text-text-secondary', bg: 'bg-surface-dark' },
   cancelled: { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' },
 };
 
 export function BookingCard({ booking }: BookingCardProps) {
   const statusStyle = statusConfig[booking.status] || statusConfig.pending;
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const formatCurrency = (value: number) => `Rp ${Math.round(value).toLocaleString('id-ID')}`;
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('id-ID', {
@@ -49,14 +44,18 @@ export function BookingCard({ booking }: BookingCardProps) {
   return (
     <Link
       href={`/dashboard/bookings/${booking.id}`}
-      className="block bg-white rounded-2xl border border-surface-light p-6 hover:shadow-lg transition-shadow"
+      className="block bg-white rounded-2xl border border-black/10 p-6 hover:shadow-lg transition-shadow"
     >
       <div className="flex gap-4">
-        <div className="w-20 h-20 rounded-xl bg-surface-light flex items-center justify-center flex-shrink-0">
+        <div className="w-20 h-20 rounded-xl bg-surface-dark flex items-center justify-center flex-shrink-0">
           {booking.camera.image_url ? (
-            <img
+            <Image
               src={booking.camera.image_url}
               alt={booking.camera.name}
+              width={80}
+              height={80}
+              loading="lazy"
+              unoptimized
               className="w-full h-full object-cover rounded-xl"
             />
           ) : (

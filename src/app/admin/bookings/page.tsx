@@ -1,7 +1,7 @@
-import { StatusBadge, STATUS_LABEL, StatusSelect } from '@/components/admin/BookingStatus';
-import type { BookingStatus } from '@/actions/admin-booking';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import type { BookingStatus } from '@/actions/admin-booking';
+import { STATUS_LABEL, StatusBadge, StatusSelect } from '@/components/admin/BookingStatus';
+import { createClient } from '@/lib/supabase/server';
 
 const STATUS_FILTERS = [
   'all',
@@ -13,12 +13,8 @@ const STATUS_FILTERS = [
   'cancelled',
 ] as const;
 
-function formatCurrency(v: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(v);
+function formatCurrency(v: number): string {
+  return `Rp ${Math.round(v).toLocaleString('id-ID')}`;
 }
 
 type SearchParams = Promise<{ status?: string }>;
@@ -44,7 +40,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-3xl font-semibold">Manajemen Booking</h1>
+      <h1 className="font-display text-3xl font-semibold text-text-dominant">Manajemen Booking</h1>
 
       {/* Filter tabs */}
       <div className="flex flex-wrap gap-2">
@@ -58,7 +54,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               className={`px-4 py-2 rounded-full font-text text-sm font-semibold transition-colors ${
                 active
                   ? 'bg-primary text-white'
-                  : 'bg-white border border-surface-light text-text-secondary hover:border-primary hover:text-primary'
+                  : 'bg-white border border-black/10 text-text-tertiary hover:border-primary hover:text-primary'
               }`}
             >
               {label}
@@ -67,10 +63,10 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
         })}
       </div>
 
-      <div className="bg-white rounded-2xl border border-surface-light shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-black/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full font-text text-sm">
-            <thead className="bg-[#f5f5f7] text-text-tertiary">
+            <thead className="bg-surface-dark text-text-tertiary">
               <tr>
                 {['Pengguna', 'Kamera', 'Periode', 'Total', 'Status', 'Aksi'].map((h) => (
                   <th key={h} className="px-6 py-3 text-left font-semibold">
@@ -79,9 +75,9 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-light">
+            <tbody className="divide-y divide-black/10">
               {bookings?.map((b) => (
-                <tr key={b.id} className="hover:bg-[#f5f5f7]/50 transition-colors">
+                <tr key={b.id} className="hover:bg-black/5 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-semibold text-text-dominant">
                       {(b.user as { full_name: string } | null)?.full_name ?? '-'}
@@ -91,7 +87,9 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                     </p>
                   </td>
                   <td className="px-6 py-4">
-                    <p>{(b.camera as { name: string } | null)?.name ?? '-'}</p>
+                    <p className="text-text-dominant">
+                      {(b.camera as { name: string } | null)?.name ?? '-'}
+                    </p>
                     <p className="text-xs text-text-tertiary">
                       {(b.camera as { brand: string } | null)?.brand ?? ''}
                     </p>
@@ -99,7 +97,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                   <td className="px-6 py-4 whitespace-nowrap text-text-secondary">
                     {b.start_date} → {b.end_date}
                   </td>
-                  <td className="px-6 py-4 font-semibold text-primary whitespace-nowrap">
+                  <td className="px-6 py-4 font-semibold text-green-700 whitespace-nowrap">
                     {formatCurrency(Number(b.final_price))}
                   </td>
                   <td className="px-6 py-4">

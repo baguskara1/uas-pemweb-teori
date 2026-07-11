@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { validateSignature } from '@/lib/midtrans';
 import { createClient } from '@/lib/supabase/server';
 

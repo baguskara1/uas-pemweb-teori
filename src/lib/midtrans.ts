@@ -59,13 +59,21 @@ export const cancelTransaction = (orderId: string) => snap.transaction.cancel(or
 export const denyTransaction = (orderId: string) => snap.transaction.deny(orderId);
 export const expireTransaction = (orderId: string) => snap.transaction.expire(orderId);
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
+// Map Midtrans payment method IDs to our DB enum
+export const methodMap: Record<string, string> = {
+  gopay: 'gopay',
+  qris: 'qris',
+  shopeepay: 'shopeepay',
+  bca_va: 'va_bca',
+  bni_va: 'va_bni',
+  credit_card: 'gopay',
+  permata_va: 'va_bca',
+  other_va: 'va_bca',
+  indomaret: 'gopay',
+  alfamart: 'gopay',
+  echannel: 'va_mandiri',
+  bank_transfer: 'va_bca',
+};
 
 // Midtrans signature spec: SHA512(orderId + statusCode + grossAmount + serverKey)
 export function validateSignature(

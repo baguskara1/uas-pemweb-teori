@@ -1,17 +1,18 @@
 'use client';
 
-import { deleteCamera } from '@/actions/camera';
-import { CameraForm } from '@/components/admin/CameraForm';
 import { Edit2, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { deleteCamera } from '@/actions/camera';
+import { CameraForm } from '@/components/admin/CameraForm';
 
 type Camera = {
   id: string;
   name: string;
   brand: string;
   type: string;
+  category: string;
   description: string | null;
   price_per_day: number;
   stock: number;
@@ -19,12 +20,8 @@ type Camera = {
   image_url: string | null;
 };
 
-function formatCurrency(v: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(v);
+function formatCurrency(v: number): string {
+  return `Rp ${Math.round(v).toLocaleString('id-ID')}`;
 }
 
 export function CamerasTable({ cameras }: { cameras: Camera[] }) {
@@ -58,7 +55,7 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-3xl font-semibold">Manajemen Kamera</h1>
+        <h1 className="font-display text-3xl font-semibold text-text-dominant">Manajemen Kamera</h1>
         <button
           type="button"
           onClick={openCreate}
@@ -69,10 +66,10 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-surface-light shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-black/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full font-text text-sm">
-            <thead className="bg-[#f5f5f7] text-text-tertiary">
+            <thead className="bg-surface-dark text-text-tertiary">
               <tr>
                 {['Kamera', 'Tipe', 'Harga/Hari', 'Stok', 'Status', 'Aksi'].map((h) => (
                   <th key={h} className="px-6 py-3 text-left font-semibold">
@@ -81,12 +78,12 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-light">
+            <tbody className="divide-y divide-black/10">
               {cameras.map((camera) => (
-                <tr key={camera.id} className="hover:bg-[#f5f5f7]/50 transition-colors">
+                <tr key={camera.id} className="hover:bg-black/5 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-surface-light overflow-hidden shrink-0">
+                      <div className="h-12 w-12 rounded-xl bg-surface-dark overflow-hidden shrink-0">
                         {camera.image_url ? (
                           <Image
                             src={camera.image_url}
@@ -108,13 +105,13 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-text-secondary">{camera.type}</td>
-                  <td className="px-6 py-4 font-semibold text-primary">
+                  <td className="px-6 py-4 font-semibold text-green-700">
                     {formatCurrency(camera.price_per_day)}
                   </td>
-                  <td className="px-6 py-4">{camera.stock}</td>
+                  <td className="px-6 py-4 text-text-dominant">{camera.stock}</td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${camera.is_available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${camera.is_available ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}
                     >
                       {camera.is_available ? 'Tersedia' : 'Tidak Tersedia'}
                     </span>
@@ -124,7 +121,7 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
                       <button
                         type="button"
                         onClick={() => openEdit(camera)}
-                        className="p-2 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"
+                        className="p-2 rounded-lg hover:bg-primary/10 text-primary transition-colors"
                         title="Edit"
                       >
                         <Edit2 className="h-4 w-4" />
@@ -132,7 +129,7 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
                       <button
                         type="button"
                         onClick={() => setConfirmId(camera.id)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-600 transition-colors"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-700 transition-colors"
                         title="Hapus"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -155,9 +152,11 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
 
       {/* Delete confirm modal */}
       {confirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
-            <h3 className="font-display text-xl font-semibold mb-2">Hapus Kamera?</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl border border-black/10 p-6 w-full max-w-sm">
+            <h3 className="font-display text-xl font-semibold text-text-dominant mb-2">
+              Hapus Kamera?
+            </h3>
             <p className="font-text text-sm text-text-tertiary mb-6">
               Tindakan ini tidak bisa dibatalkan. Kamera akan dihapus permanen dari sistem.
             </p>
@@ -165,7 +164,7 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
               <button
                 type="button"
                 onClick={() => setConfirmId(null)}
-                className="flex-1 border border-surface-light rounded-full py-2.5 font-text text-sm hover:bg-surface-light/50 transition-colors"
+                className="flex-1 border border-black/15 rounded-full py-2.5 font-text text-sm text-text-dominant hover:bg-surface-dark transition-colors"
               >
                 Batal
               </button>

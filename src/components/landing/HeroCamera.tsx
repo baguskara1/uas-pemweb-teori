@@ -5,7 +5,10 @@
  */
 export function HeroCamera() {
   return (
-    <div className="relative flex min-h-[420px] items-center justify-center [perspective:1200px]" aria-hidden="true">
+    <div
+      className="relative flex min-h-[420px] items-center justify-center [perspective:1200px]"
+      aria-hidden="true"
+    >
       {/* Static soft halo — radial gradient, no filter:blur */}
       <div
         className="absolute h-72 w-72 rounded-full"
@@ -51,13 +54,7 @@ export function HeroCamera() {
               <stop offset="0.7" stopColor="#18181a" />
               <stop offset="1" stopColor="#0c0c0e" />
             </radialGradient>
-            <radialGradient
-              id="glassGrad"
-              cx="184"
-              cy="144"
-              r="42"
-              gradientUnits="userSpaceOnUse"
-            >
+            <radialGradient id="glassGrad" cx="184" cy="144" r="42" gradientUnits="userSpaceOnUse">
               <stop stopColor="#1a4d8c" />
               <stop offset="0.7" stopColor="#0a1f3d" />
               <stop offset="1" stopColor="#050a14" />

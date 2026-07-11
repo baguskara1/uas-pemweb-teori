@@ -1,12 +1,13 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { createClient } from '@/lib/supabase/server';
 
 export type CameraFormData = {
   name: string;
   brand: string;
   type: string;
+  category: string;
   description: string;
   price_per_day: number;
   stock: number;
@@ -43,6 +44,7 @@ export async function createCamera(formData: FormData) {
     name: formData.get('name') as string,
     brand: formData.get('brand') as string,
     type: formData.get('type') as string,
+    category: (formData.get('category') as string) || 'camera',
     description: (formData.get('description') as string) || null,
     price_per_day: Number(formData.get('price_per_day')),
     stock: Number(formData.get('stock')),
@@ -59,7 +61,7 @@ export async function updateCamera(id: string, formData: FormData) {
   const supabase = await createClient();
 
   const imageFile = formData.get('image') as File | null;
-  let image_url: string | undefined = undefined;
+  let image_url: string | undefined;
   if (imageFile && imageFile.size > 0) {
     image_url = (await uploadImage(imageFile)) ?? undefined;
   }
@@ -68,6 +70,7 @@ export async function updateCamera(id: string, formData: FormData) {
     name: formData.get('name') as string,
     brand: formData.get('brand') as string,
     type: formData.get('type') as string,
+    category: formData.get('category') as string,
     description: (formData.get('description') as string) || '',
     price_per_day: Number(formData.get('price_per_day')),
     stock: Number(formData.get('stock')),
