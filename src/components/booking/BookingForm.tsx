@@ -202,10 +202,16 @@ export function BookingForm({ camera }: BookingFormProps) {
               </div>
             </div>
 
+            {error && (
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 font-text text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setShowConfirm(false)}
+                onClick={() => { setShowConfirm(false); setError(null); }}
                 disabled={loading}
                 className="flex-1 h-12 border border-surface-light rounded-full font-text font-semibold hover:bg-surface-light/30 transition-colors disabled:opacity-50"
               >
