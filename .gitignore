@@ -45,3 +45,4 @@ test-report-*.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+*.txt
