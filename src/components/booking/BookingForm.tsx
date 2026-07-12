@@ -69,28 +69,33 @@ export function BookingForm({ camera }: BookingFormProps) {
     setLoading(true);
     setError(null);
 
-    const result = await createBooking({
-      camera_id: camera.id,
-      start_date: startDate,
-      end_date: endDate,
-      duration: durationDays,
-      total_price: totalPrice,
-    });
+    try {
+      const result = await createBooking({
+        camera_id: camera.id,
+        start_date: startDate,
+        end_date: endDate,
+        duration: durationDays,
+        total_price: totalPrice,
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (!result.success) {
-      setError(result.error || 'Terjadi kesalahan');
-      return;
+      if (!result.success) {
+        setError(result.error || 'Terjadi kesalahan');
+        return;
+      }
+
+      setShowConfirm(false);
+      if (result.data?.id) {
+        router.push(`/dashboard/bookings/${result.data.id}`);
+      } else {
+        router.push('/dashboard/bookings');
+      }
+      router.refresh();
+    } catch (e) {
+      setLoading(false);
+      setError(e instanceof Error ? e.message : 'Gagal membuat booking');
     }
-
-    setShowConfirm(false);
-    if (result.data?.id) {
-      router.push(`/dashboard/bookings/${result.data.id}`);
-    } else {
-      router.push('/dashboard/bookings');
-    }
-    router.refresh();
   };
 
   return (
