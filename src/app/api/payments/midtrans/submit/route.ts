@@ -100,7 +100,7 @@ async function handler(request: NextRequest) {
         {
           success: false,
           message: 'Failed to create payment record',
-          error: paymentError?.message,
+          error: 'PAYMENT_CREATE_FAILED',
         },
         { status: 500 },
       );
@@ -169,7 +169,7 @@ async function handler(request: NextRequest) {
       {
         success: false,
         message: 'Internal server error',
-        error: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
+        error: 'INTERNAL_ERROR',
       },
       { status: 500 },
     );

@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync, readdirSync } from 'fs';
-import { join, parse } from 'path';
+import { join } from 'path';
 
 const supabaseUrl = 'https://aomcdmeqykiiistciahw.supabase.co';
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -43,7 +43,7 @@ async function main() {
     const cleanName = file.replace(/\.avif$/, '');
 
     console.log(`Uploading ${file}...`);
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(BUCKET)
       .upload(fileName, blob, {
         contentType: 'image/avif',

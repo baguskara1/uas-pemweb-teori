@@ -28,7 +28,12 @@ export function CameraCard({ camera }: CameraCardProps) {
   const { user } = useAuth();
   const { addItem, items } = useCart();
   const { show } = useToast();
-  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlisted, setWishlisted] = useState(() => {
+    if (!user) return false;
+    const key = `wishlist:${camera.id}`;
+    const cached = sessionStorage.getItem(key);
+    return cached === 'true';
+  });
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const inCart = items.some((i) => i.id === camera.id);
 
@@ -36,14 +41,15 @@ export function CameraCard({ camera }: CameraCardProps) {
 
   useEffect(() => {
     if (!user) return;
+    if (fetchedRef.current) return;
+    
     const key = `wishlist:${camera.id}`;
     const cached = sessionStorage.getItem(key);
-    if (cached) {
-      setWishlisted(cached === 'true');
+    if (cached !== null) {
       fetchedRef.current = true;
       return;
     }
-    if (fetchedRef.current) return;
+    
     fetch('/api/wishlist')
       .then((r) => r.json())
       .then((d) => {
@@ -106,6 +112,7 @@ export function CameraCard({ camera }: CameraCardProps) {
   return (
     <Link
       href={`/cameras/${camera.id}`}
+      data-testid="camera-card-link"
       className="group flex flex-col bg-white border border-black/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-black/15 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
     >
       <div className="relative aspect-[4/3] w-full bg-surface-dark overflow-hidden">

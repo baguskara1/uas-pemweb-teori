@@ -2,7 +2,7 @@
 
 import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { CATEGORY_OPTIONS } from '@/lib/constants';
 
 type FilterSidebarProps = {
@@ -15,12 +15,12 @@ export function FilterSidebar({ brands, types, defaultCategory = '' }: FilterSid
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get('q') || '');
-  const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(searchParams.getAll('brand'));
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(searchParams.getAll('type'));
-  const [minPrice, setMinPrice] = useState(searchParams.get('min_price') || '');
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '');
+  const [search, setSearch] = useState(() => searchParams.get('q') || '');
+  const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get('category') || defaultCategory);
+  const [selectedBrands, setSelectedBrands] = useState(() => searchParams.getAll('brand'));
+  const [selectedTypes, setSelectedTypes] = useState(() => searchParams.getAll('type'));
+  const [minPrice, setMinPrice] = useState(() => searchParams.get('min_price') || '');
+  const [maxPrice, setMaxPrice] = useState(() => searchParams.get('max_price') || '');
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -82,16 +82,6 @@ export function FilterSidebar({ brands, types, defaultCategory = '' }: FilterSid
     setMaxPrice('');
     router.push('/cameras');
   };
-
-  // Sync local state when URL changes externally (e.g. back/forward nav)
-  useEffect(() => {
-    setSearch(searchParams.get('q') || '');
-    setSelectedCategory(searchParams.get('category') || '');
-    setSelectedBrands(searchParams.getAll('brand'));
-    setSelectedTypes(searchParams.getAll('type'));
-    setMinPrice(searchParams.get('min_price') || '');
-    setMaxPrice(searchParams.get('max_price') || '');
-  }, [searchParams]);
 
   return (
     <div className="flex flex-col gap-8 bg-white border border-black/10 p-6 rounded-2xl">

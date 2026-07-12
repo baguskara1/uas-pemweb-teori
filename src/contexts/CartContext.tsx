@@ -36,11 +36,7 @@ function loadCart(): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    setItems(loadCart());
-  }, []);
+  const [items, setItems] = useState<CartItem[]>(() => loadCart());
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));

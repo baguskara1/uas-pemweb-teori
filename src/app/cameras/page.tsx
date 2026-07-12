@@ -60,7 +60,8 @@ export default async function CamerasPage(props: { searchParams: SearchParams })
     query = query.eq('category', category);
   }
   if (searchQuery) {
-    query = query.ilike('name', `%${searchQuery}%`);
+    const escaped = searchQuery.replace(/[%_]/g, '\\$&');
+    query = query.ilike('name', `%${escaped}%`);
   }
   if (brandParams.length > 0) {
     query = query.in('brand', brandParams);

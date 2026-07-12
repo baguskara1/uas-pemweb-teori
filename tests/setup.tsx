@@ -62,6 +62,7 @@ vi.mock('@supabase/ssr', () => ({
 // Mock next/image
 vi.mock('next/image', () => ({
   default: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { src: string; alt: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt} {...props} />
   ),
 }));

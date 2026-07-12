@@ -15,3 +15,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Phase 6: Wire-Up completed (layout.tsx + Navbar.tsx + page.tsx, lint clean)
 - Phase 7: Build completed (npm run build — zero errors, 21 routes)
 - Types regenerated (src/types/database.ts — includes wishlists, testimonials, faqs)
+- QRIS: API returns `qrString` (URL to QR code image), NOT `snapUrl`. CartModal checks `json.data.method === 'qris'` and shows QR code in modal.
+- Multiple CSP headers = browser enforces STRICTEST intersection. Nginx CSP removed; middleware handles all CSP.
+- Never call `setState()` outside useEffect/event handlers in React — causes infinite re-render.
+- Server actions called from client components MUST be wrapped in try-catch.
+- Error messages in confirmation dialogs must be rendered INSIDE the dialog, not outside it.
+- All items (cameras, lenses, accessories) in same `cameras` table with `category` field.

@@ -33,6 +33,12 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# playwright
+playwright/.auth/
+playwright-report/
+test-results/
+test-report-*.md
+
 # vercel
 .vercel
 

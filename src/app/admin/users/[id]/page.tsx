@@ -1,8 +1,9 @@
 'use client';
 
 import { Calendar, Mail, Phone, User } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 
 type UserProfile = {
   id: string;
@@ -33,7 +34,7 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
 
   const supabase = createClient();
 
-  async function _fetchUserData() {
+  const fetchUserData = useCallback(async () => {
     const { data: profile } = await supabase
       .from('profiles')
       .select(`id, full_name, email, phone, role, avatar_url, created_at`)
@@ -75,7 +76,14 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
       }));
       setBookings(formatted as unknown as Booking[]);
     }
-  }
+  }, [params.id, supabase]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchUserData();
+    };
+    loadData();
+  }, [fetchUserData]);
 
   return (
     <div className="space-y-6">
@@ -100,10 +108,13 @@ export default function AdminUserDetailPage({ params }: { params: { id: string }
             <div className="p-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 {user.avatar_url ? (
-                  <img
+                  <Image
                     src={user.avatar_url}
                     alt={user.full_name}
+                    width={96}
+                    height={96}
                     className="h-24 w-24 rounded-full object-cover border-4 border-surface-light"
+                    unoptimized
                   />
                 ) : (
                   <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center border-4 border-surface-light">

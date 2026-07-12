@@ -1,5 +1,6 @@
 'use client';
 import { Camera, ChevronDown, ChevronLeft, ChevronRight, Heart, Search } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/components/shared/Toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -259,10 +260,12 @@ export function CatalogSection({ initialCameras, brands, types }: CatalogSection
                 >
                   <div className="relative aspect-[4/3] bg-surface-dark overflow-hidden">
                     {camera.image_url ? (
-                      <img
+                      <Image
                         src={camera.image_url}
                         alt={camera.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="grid h-full place-items-center">

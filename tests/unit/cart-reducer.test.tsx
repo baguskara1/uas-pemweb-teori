@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock localStorage using vi.hoisted to ensure it's available before imports
-const { localStorageStore, localStorageMock } = vi.hoisted(() => {
+const { localStorageMock } = vi.hoisted(() => {
   const store: Record<string, string> = {};
   const mock = {
     getItem: vi.fn((key: string) => store[key] || null),
@@ -11,7 +11,7 @@ const { localStorageStore, localStorageMock } = vi.hoisted(() => {
     get length() { return Object.keys(store).length; },
     key: vi.fn((i: number) => Object.keys(store)[i] || null),
   };
-  return { localStorageStore: store, localStorageMock: mock };
+  return { localStorageMock: mock };
 });
 
 // Mock localStorage globally before any imports

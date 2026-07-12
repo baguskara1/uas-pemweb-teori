@@ -142,6 +142,8 @@ export function validateSignature(
     .createHash('sha512')
     .update(`${orderId}${statusCode}${grossAmount}${serverKey}`)
     .digest('hex');
-  // ponytail: skip timing-safe compare — webhook caller (Midtrans) is trusted infra, not user input.
-  return calculated === signatureKey;
+  const expected = Buffer.from(calculated, 'hex');
+  const received = Buffer.from(signatureKey, 'hex');
+  if (expected.length !== received.length) return false;
+  return crypto.timingSafeEqual(expected, received);
 }

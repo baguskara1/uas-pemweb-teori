@@ -234,7 +234,7 @@ async function handler(request: NextRequest) {
     if (paymentError || !payment) {
       await supabase.from('bookings').update({ status: 'cancelled' }).in('id', bookingIds);
       return NextResponse.json(
-        { success: false, message: 'Failed to create payment', error: paymentError?.message },
+        { success: false, message: 'Failed to create payment', error: 'PAYMENT_CREATE_FAILED' },
         { status: 500 },
       );
     }
@@ -333,7 +333,7 @@ async function handler(request: NextRequest) {
       {
         success: false,
         message: 'Internal server error',
-        error: error instanceof Error ? error.message : 'UNKNOWN_ERROR',
+        error: 'INTERNAL_ERROR',
       },
       { status: 500 },
     );

@@ -1,5 +1,6 @@
 'use client';
 import { Camera, Heart, X } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getWishlist, removeFromWishlist } from '@/lib/wishlist';
@@ -24,15 +25,33 @@ export function WishlistDrawer({ open, onClose }: { open: boolean; onClose: () =
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open && user) {
+    let cancelled = false;
+    
+    async function fetchWishlist() {
+      if (!open || !user) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
-      getWishlist()
-        .then((data) => {
+      try {
+        const data = await getWishlist();
+        if (!cancelled) {
           setItems(data);
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) {
           setLoading(false);
-        })
-        .catch(() => setLoading(false));
+        }
+      }
     }
+    
+    fetchWishlist();
+    
+    return () => { cancelled = true; };
   }, [open, user]);
 
   const handleRemove = async (cameraId: string) => {
@@ -83,12 +102,14 @@ export function WishlistDrawer({ open, onClose }: { open: boolean; onClose: () =
                       key={item.id}
                       className="flex gap-4 p-3 rounded-xl bg-surface-dark border border-black/10"
                     >
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-surface-light shrink-0">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-surface-light shrink-0 relative">
                         {item.camera?.image_url ? (
-                          <img
+                          <Image
                             src={item.camera.image_url}
                             alt={item.camera.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="64px"
+                            className="object-cover"
                           />
                         ) : (
                           <div className="grid h-full place-items-center">

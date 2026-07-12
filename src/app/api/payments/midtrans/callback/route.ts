@@ -46,6 +46,21 @@ export async function POST(request: NextRequest) {
       paymentStatus = 'expired';
     }
 
+    // Idempotency: skip if payment already in a terminal state.
+    // Prevents regression (e.g. paid -> pending from out-of-order duplicates).
+    const terminalStatuses = ['paid', 'failed', 'expired'];
+    const { data: existingPayment } = await supabase
+      .from('payments')
+      .select('status')
+      .eq('midtrans_order_id', orderId)
+      .single();
+
+    if (existingPayment && !existingPayment.status) {
+      // Payment exists but status is null — treat as non-terminal, proceed.
+    } else if (existingPayment && terminalStatuses.includes(existingPayment.status)) {
+      return NextResponse.json({ success: true, message: 'Already processed (idempotent)' }, { status: 200 });
+    }
+
     // Call RPC — anon role has EXECUTE only; SECURITY DEFINER bypasses RLS inside function.
     const { data: paymentId, error: rpcError } = await supabase.rpc('update_payment_from_webhook', {
       p_order_id: orderId,

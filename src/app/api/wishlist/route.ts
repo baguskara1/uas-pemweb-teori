@@ -15,7 +15,7 @@ async function getWishlists() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Failed to fetch wishlist' }, { status: 500 });
   return NextResponse.json({ data });
 }
 
@@ -35,7 +35,7 @@ async function addWishlist(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Failed to add to wishlist' }, { status: 500 });
   return NextResponse.json({ data }, { status: 201 });
 }
 
@@ -55,7 +55,7 @@ async function removeWishlist(request: NextRequest) {
     .eq('user_id', user.id)
     .eq('camera_id', cameraId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Failed to remove from wishlist' }, { status: 500 });
   return NextResponse.json({ success: true });
 }
 

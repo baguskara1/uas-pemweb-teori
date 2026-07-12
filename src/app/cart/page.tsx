@@ -3,7 +3,7 @@
 import { ShoppingCart, Trash2, QrCode, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 
 export default function CartPage() {
@@ -22,11 +22,11 @@ export default function CartPage() {
     }));
   };
 
-  const calcDuration = (start: string, end: string) => {
+  const calcDuration = useCallback((start: string, end: string) => {
     if (!start || !end) return 0;
     const diff = new Date(end).getTime() - new Date(start).getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  };
+  }, []);
 
   const totals = useMemo(() => {
     let subtotal = 0;
@@ -106,7 +106,7 @@ export default function CartPage() {
 
       // Non-QRIS: redirect ke Midtrans
       window.location.href = json.data.snapUrl;
-    } catch (_err) {
+    } catch {
       alert('Terjadi kesalahan. Silakan coba lagi.');
       setLoading(false);
     }
@@ -303,9 +303,12 @@ export default function CartPage() {
             </p>
 
             <div className="bg-white border-2 border-black/10 rounded-2xl p-4 mb-4">
-              <img
+              <Image
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.qrString)}`}
                 alt="QRIS QR Code"
+                width={250}
+                height={250}
+                unoptimized
                 className="w-full max-w-[250px] mx-auto"
               />
             </div>

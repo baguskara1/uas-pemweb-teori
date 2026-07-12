@@ -1,7 +1,8 @@
 'use client';
 
 import { Search } from 'lucide-react';
-import { useState } from 'react';
+import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 type User = {
@@ -20,14 +21,15 @@ export default function AdminUsersPage() {
 
   const supabase = createClient();
 
-  async function _fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     let query = supabase
       .from('profiles')
       .select(`id, full_name, email, phone, role, avatar_url, created_at`)
       .order('created_at', { ascending: false });
 
     if (searchQuery.trim()) {
-      query = query.or(`full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+      const escaped = searchQuery.trim().replace(/[%_]/g, '\\$&');
+      query = query.or(`full_name.ilike.%${escaped}%,email.ilike.%${escaped}%`);
     }
 
     const { data } = await query;
@@ -35,7 +37,14 @@ export default function AdminUsersPage() {
     if (data && Array.isArray(data)) {
       setUsers(data as unknown as User[]);
     }
-  }
+  }, [searchQuery, supabase]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchUsers();
+    };
+    loadData();
+  }, [fetchUsers]);
 
   return (
     <div className="space-y-6">
@@ -83,10 +92,13 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {user.avatar_url ? (
-                        <img
+                        <Image
                           src={user.avatar_url}
                           alt={user.full_name}
+                          width={40}
+                          height={40}
                           className="h-10 w-10 rounded-full object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
