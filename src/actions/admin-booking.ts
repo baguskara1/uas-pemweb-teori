@@ -25,3 +25,15 @@ export async function deleteBooking(id: string) {
   revalidatePath('/admin/bookings');
   return { error: null };
 }
+
+export async function deleteMultipleBookings(ids: string[]) {
+  if (ids.length === 0) return { error: 'Tidak ada booking yang dipilih' };
+  const supabase = createServiceClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SERVICE_ROLE_KEY!,
+  );
+  const { error } = await supabase.from('bookings').delete().in('id', ids);
+  if (error) return { error: error.message };
+  revalidatePath('/admin/bookings');
+  return { error: null };
+}
