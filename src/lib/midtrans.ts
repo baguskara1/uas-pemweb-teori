@@ -53,6 +53,61 @@ export async function generateSnapToken(params: {
   });
 }
 
+// QRIS direct charge (bypasses Snap, returns QR code URL)
+export async function chargeQris(params: {
+  orderId: string;
+  grossAmount: number;
+  itemDetails: { id: string; name: string; price: number; quantity: number }[];
+}) {
+  const baseUrl = isProduction
+    ? 'https://api.midtrans.com'
+    : 'https://api.sandbox.midtrans.com';
+
+  const auth = Buffer.from(`${serverKey}:`).toString('base64');
+
+  const body = {
+    payment_type: 'qris',
+    transaction_details: {
+      order_id: params.orderId,
+      gross_amount: params.grossAmount,
+    },
+    item_details: params.itemDetails,
+  };
+
+  const res = await fetch(`${baseUrl}/v2/charge`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Basic ${auth}`,
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+
+  if (data.status_code !== '201' && data.status_code !== '200') {
+    throw new Error(data.status_message || 'QRIS charge failed');
+  }
+
+  // QR string for generating QR code
+  const qrString = data.actions?.find((a: { url?: string; name?: string }) => a.name === 'generate-qr-code')?.url
+    ?? data.qr_string
+    ?? data.acquirer?.qr_string
+    ?? '';
+
+  return {
+    orderId: params.orderId,
+    grossAmount: params.grossAmount,
+    qrString,
+    transactionId: data.transaction_id,
+    statusCode: data.status_code,
+    status: data.transaction_status,
+    expiryTime: data.expiry_time,
+    raw: data,
+  };
+}
+
 export const checkTransactionStatus = (orderId: string) => snap.transaction.status(orderId);
 export const approveTransaction = (orderId: string) => snap.transaction.approve(orderId);
 export const cancelTransaction = (orderId: string) => snap.transaction.cancel(orderId);

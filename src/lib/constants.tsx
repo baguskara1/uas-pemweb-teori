@@ -1,4 +1,4 @@
-import { CreditCard, Landmark, Smartphone, Store } from 'lucide-react';
+import { CreditCard, Landmark, QrCode, Store, Wallet } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 // ── CameraForm constants ──
@@ -34,13 +34,13 @@ export type PaymentMethod = {
 };
 
 export const PAYMENT_METHODS: PaymentMethod[] = [
-  { id: 'gopay', label: 'GoPay', group: 'ewallet', icon: <Smartphone className="w-4 h-4" /> },
-  { id: 'qris', label: 'QRIS', group: 'ewallet', icon: <Smartphone className="w-4 h-4" /> },
+  { id: 'gopay', label: 'GoPay', group: 'ewallet', icon: <Wallet className="w-4 h-4" /> },
+  { id: 'qris', label: 'QRIS', group: 'ewallet', icon: <QrCode className="w-4 h-4" /> },
   {
     id: 'shopeepay',
     label: 'ShopeePay',
     group: 'ewallet',
-    icon: <Smartphone className="w-4 h-4" />,
+    icon: <Wallet className="w-4 h-4" />,
   },
   {
     id: 'bca_va',

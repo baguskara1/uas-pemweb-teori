@@ -132,9 +132,9 @@ async function handler(request: NextRequest) {
           ]
         : undefined,
       callbacks: {
-        finish: `${baseUrl}/payment/status?order_id=${orderId}`,
-        error: `${baseUrl}/payment/status?order_id=${orderId}`,
-        pending: `${baseUrl}/payment/status?order_id=${orderId}`,
+        finish: `${baseUrl}/dashboard/bookings`,
+        error: `${baseUrl}/dashboard/bookings`,
+        pending: `${baseUrl}/dashboard/bookings`,
       },
     });
 

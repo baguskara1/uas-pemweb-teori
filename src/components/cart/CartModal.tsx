@@ -82,6 +82,8 @@ export function CartModal({ open, onClose }: CartModalProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           payMethod: paymentMethod,
+          start_date: startDate,
+          end_date: endDate,
           items: items.map((item) => ({
             id: item.id,
             start_date: startDate,
@@ -193,7 +195,7 @@ export function CartModal({ open, onClose }: CartModalProps) {
   );
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start justify-center pt-8 sm:pt-12 pb-4">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-start justify-center sm:pt-8 sm:pt-12 pb-0 sm:pb-4">
       <div
         className="absolute inset-0 bg-black/30"
         style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
@@ -206,7 +208,7 @@ export function CartModal({ open, onClose }: CartModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-title"
-        className="relative z-10 w-full max-w-2xl mx-4 bg-white rounded-3xl shadow-2xl border border-black/10 flex flex-col max-h-[calc(100vh-4rem)]"
+        className="relative z-10 w-full max-w-2xl sm:mx-4 bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl border border-black/10 flex flex-col max-h-[85vh] sm:max-h-[calc(100vh-4rem)]"
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-black/10 shrink-0">
           <div className="flex items-center gap-2">

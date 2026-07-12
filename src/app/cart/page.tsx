@@ -1,6 +1,6 @@
 'use client';
 
-import { ShoppingCart, Trash2 } from 'lucide-react';
+import { ShoppingCart, Trash2, QrCode, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -11,6 +11,7 @@ export default function CartPage() {
 
   const [dates, setDates] = useState<Record<string, { start: string; end: string }>>({});
   const [loading, setLoading] = useState(false);
+  const [qrData, setQrData] = useState<{ qrString: string; orderId: string; amount: number } | null>(null);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
@@ -56,6 +57,17 @@ export default function CartPage() {
 
     try {
       const firstItemDates = items[0] ? dates[items[0].id] : null;
+      const payload = {
+        items: items.map((item) => ({
+          id: item.id,
+          start_date: dates[item.id].start,
+          end_date: dates[item.id].end,
+          duration: calcDuration(dates[item.id].start, dates[item.id].end),
+        })),
+        start_date: firstItemDates?.start || '',
+        end_date: firstItemDates?.end || '',
+      };
+      console.log('[Cart] Checkout payload:', JSON.stringify(payload, null, 2));
       const res = await fetch('/api/payments/midtrans/multi-submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -80,7 +92,19 @@ export default function CartPage() {
       }
 
       clearCart();
-      // Redirect to Midtrans payment page
+
+      // QRIS: tampilkan QR code langsung
+      if (json.data.method === 'qris') {
+        setQrData({
+          qrString: json.data.qrString,
+          orderId: json.data.orderId,
+          amount: json.data.amount,
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Non-QRIS: redirect ke Midtrans
       window.location.href = json.data.snapUrl;
     } catch (_err) {
       alert('Terjadi kesalahan. Silakan coba lagi.');
@@ -115,7 +139,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-container px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-container px-4 py-8 pb-32 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <ShoppingCart className="w-7 h-7 text-primary" />
@@ -257,6 +281,57 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+
+      {/* QRIS QR Code Modal */}
+      {qrData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center relative">
+            <button
+              onClick={() => setQrData(null)}
+              className="absolute top-4 right-4 text-text-tertiary hover:text-black transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <QrCode className="w-6 h-6 text-primary" />
+              <h2 className="font-display text-xl font-semibold">Bayar dengan QRIS</h2>
+            </div>
+
+            <p className="font-text text-sm text-text-tertiary mb-4">
+              Scan QR Code di bawah ini menggunakan aplikasi bank/e-wallet Anda
+            </p>
+
+            <div className="bg-white border-2 border-black/10 rounded-2xl p-4 mb-4">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.qrString)}`}
+                alt="QRIS QR Code"
+                className="w-full max-w-[250px] mx-auto"
+              />
+            </div>
+
+            <div className="space-y-2 font-text text-sm">
+              <div className="flex justify-between">
+                <span className="text-text-tertiary">Order ID</span>
+                <span className="font-mono text-xs">{qrData.orderId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-tertiary">Total Bayar</span>
+                <span className="font-semibold text-primary">
+                  Rp {qrData.amount.toLocaleString('id-ID')}
+                </span>
+              </div>
+            </div>
+
+            <Link
+              href="/dashboard/bookings"
+              className="mt-6 w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-full font-text font-semibold transition-colors flex items-center justify-center"
+            >
+              Lihat Status Pesanan
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

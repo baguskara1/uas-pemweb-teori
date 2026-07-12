@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { generateSnapToken, methodMap, snapConfig } from '@/lib/midtrans';
+import { chargeQris, generateSnapToken, methodMap, snapConfig } from '@/lib/midtrans';
 import { withRateLimit } from '@/lib/rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
@@ -40,12 +40,14 @@ async function handler(request: NextRequest) {
     }
 
     const body = await request.json();
+    console.log('[Multi-Submit] Received body:', JSON.stringify(body, null, 2));
     const { items, payMethod, start_date, end_date } = body as {
       items: { id: string; start_date: string; end_date: string; duration: number }[];
       payMethod?: string;
       start_date: string;
       end_date: string;
     };
+    console.log('[Multi-Submit] Parsed:', { itemsCount: items?.length, payMethod, start_date, end_date });
 
     // ---- VALIDATION START ----
 
@@ -241,6 +243,49 @@ async function handler(request: NextRequest) {
     const fullName = profile?.full_name ?? user.email?.split('@')[0] ?? 'Customer';
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? '';
 
+    const itemDetails = cameraDetails.map((c) => ({
+      id: c.id,
+      name: c.name,
+      price: c.price_per_day,
+      quantity: c.duration,
+      brand: c.brand,
+      category: 'camera',
+    }));
+
+    // QRIS: charge langsung tanpa Snap
+    if (payMethod === 'qris') {
+      const qrisResponse = await chargeQris({
+        orderId,
+        grossAmount: totalAmount,
+        itemDetails,
+      });
+
+      await supabase
+        .from('payments')
+        .update({
+          midtrans_token: qrisResponse.qrString,
+          midtrans_response: qrisResponse,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', payment.id);
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'QRIS payment initialized',
+          data: {
+            paymentId: payment.id,
+            orderId,
+            method: 'qris',
+            qrString: qrisResponse.qrString,
+            amount: totalAmount,
+          },
+        },
+        { status: 200 },
+      );
+    }
+
+    // Non-QRIS: lewat Snap seperti biasa
     const snapResponse = await generateSnapToken({
       orderId,
       grossAmount: totalAmount,
@@ -250,19 +295,11 @@ async function handler(request: NextRequest) {
         email: user.email ?? '',
         phone: profile?.phone ?? '',
       },
-      itemDetails: cameraDetails.map((c) => ({
-        id: c.id,
-        name: c.name,
-        price: c.price_per_day,
-        quantity: c.duration,
-        brand: c.brand,
-        category: 'camera',
-      })),
-      enabledPayments: [payMethod],
+      itemDetails,
       callbacks: {
-        finish: `${baseUrl}/payment/status?order_id=${orderId}`,
-        error: `${baseUrl}/payment/status?order_id=${orderId}`,
-        pending: `${baseUrl}/payment/status?order_id=${orderId}`,
+        finish: `${baseUrl}/dashboard/bookings`,
+        error: `${baseUrl}/dashboard/bookings`,
+        pending: `${baseUrl}/dashboard/bookings`,
       },
     });
 

@@ -9,6 +9,7 @@ type Profile = {
   id: string;
   full_name: string;
   email: string;
+  phone?: string | null;
   role: 'user' | 'admin';
   avatar_url?: string | null;
 };
