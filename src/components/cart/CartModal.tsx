@@ -2,6 +2,7 @@
 
 import { CalendarDays, Loader2, ShoppingCart, Trash2, Wallet, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useToast } from '@/components/shared/Toast';
 import { useCart } from '@/contexts/CartContext';
@@ -35,11 +36,11 @@ export function CartModal({ open, onClose }: CartModalProps) {
   const [endDate, setEndDate] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('gopay');
   const [loading, setLoading] = useState(false);
+  const [qrPayment, setQrPayment] = useState<{ qrString: string; amount: number; orderId: string } | null>(null);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const modalRef = useRef<HTMLDivElement>(null);
-  const _triggerRef = useRef<HTMLButtonElement>(null);
   const firstFocusableRef = useRef<HTMLElement>(null);
   const lastFocusableRef = useRef<HTMLElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -104,15 +105,27 @@ export function CartModal({ open, onClose }: CartModalProps) {
       clearCart();
       setStartDate('');
       setEndDate('');
-      window.location.href = json.data.snapUrl;
+
+      if (json.data.method === 'qris') {
+        setQrPayment({
+          qrString: json.data.qrString,
+          amount: json.data.amount,
+          orderId: json.data.orderId,
+        });
+        setLoading(false);
+      } else {
+        window.location.href = json.data.snapUrl;
+      }
     } catch {
       alert('Terjadi kesalahan. Silakan coba lagi.');
       setLoading(false);
     }
   };
 
-  // Focus trap and modal accessibility
+      // Focus trap and modal accessibility
   useEffect(() => {
+    if (!open) setQrPayment(null);
+
     if (open) {
       // Store the element that triggered the modal
       previousActiveElement.current = document.activeElement as HTMLElement;
@@ -240,7 +253,37 @@ export function CartModal({ open, onClose }: CartModalProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-          {items.length === 0 ? (
+          {qrPayment ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4">
+                <Wallet className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="font-display text-lg font-semibold mb-2 text-text-dominant">
+                Pembayaran QRIS
+              </h3>
+              <p className="font-text text-sm text-text-tertiary mb-6 max-w-xs">
+                Scan kode QR di bawah menggunakan aplikasi e-wallet Anda (GoPay, OVO, DANA, ShopeePay, LinkAja)
+              </p>
+              <div className="bg-white rounded-2xl border border-black/10 p-4 mb-4 shadow-sm">
+                <img
+                  src={qrPayment.qrString}
+                  alt="QRIS"
+                  className="w-56 h-56"
+                />
+              </div>
+              <div className="space-y-1 mb-4">
+                <p className="font-text text-sm font-semibold text-text-dominant">
+                  Total: {formatCurrency(qrPayment.amount)}
+                </p>
+                <p className="font-text text-xs text-text-tertiary">
+                  Order: {qrPayment.orderId}
+                </p>
+              </div>
+              <p className="font-text text-xs text-text-tertiary">
+                Status pembayaran akan otomatis terupdate. Cek di menu Booking Saya.
+              </p>
+            </div>
+          ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center text-text-tertiary">
               <ShoppingCart className="w-12 h-12 mb-3 opacity-40" aria-hidden="true" />
               <p className="font-text text-sm">Keranjang masih kosong</p>
@@ -399,7 +442,17 @@ export function CartModal({ open, onClose }: CartModalProps) {
           )}
         </div>
 
-        {items.length > 0 && (
+        {qrPayment && (
+          <div className="shrink-0 px-6 py-4 border-t border-black/10">
+            <Link
+              href="/dashboard/bookings"
+              className="w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-full font-text font-semibold transition-colors flex items-center justify-center"
+            >
+              Lihat Booking Saya
+            </Link>
+          </div>
+        )}
+        {!qrPayment && items.length > 0 && (
           <div className="shrink-0 px-6 py-4 border-t border-black/10 space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-display font-semibold">Total</span>
