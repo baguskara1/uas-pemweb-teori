@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { StatusBadge, StatusSelect } from '@/components/admin/BookingStatus';
+import { DeleteBookingButton } from '@/components/admin/DeleteBookingButton';
 import { BOOKING_STATUS_LABEL, type BookingStatus } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 
@@ -112,6 +113,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       >
                         Detail
                       </Link>
+                      <DeleteBookingButton bookingId={b.id} />
                     </div>
                   </td>
                 </tr>

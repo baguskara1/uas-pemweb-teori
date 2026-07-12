@@ -12,3 +12,11 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
   revalidatePath(`/admin/bookings/${id}`);
   return { error: null };
 }
+
+export async function deleteBooking(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from('bookings').delete().eq('id', id);
+  if (error) return { error: error.message };
+  revalidatePath('/admin/bookings');
+  return { error: null };
+}
