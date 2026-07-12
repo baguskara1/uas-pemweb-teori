@@ -85,7 +85,11 @@ export function BookingForm({ camera }: BookingFormProps) {
     }
 
     setShowConfirm(false);
-    router.push(`/dashboard/bookings/${result.data?.id}`);
+    if (result.data?.id) {
+      router.push(`/dashboard/bookings/${result.data.id}`);
+    } else {
+      router.push('/dashboard/bookings');
+    }
     router.refresh();
   };
 

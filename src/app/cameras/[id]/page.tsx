@@ -2,14 +2,7 @@ import { Calendar, Camera, CheckCircle2, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/server';
-
-const _Pill = ({ children }: { children: ReactNode }) => (
-  <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70">
-    {children}
-  </span>
-);
 
 export default async function CameraDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -134,7 +127,7 @@ export default async function CameraDetailPage(props: { params: Promise<{ id: st
                   className="flex items-center justify-center w-full h-14 bg-primary hover:bg-primary-hover active:bg-primary-press text-white font-text text-lg font-semibold rounded-full transition-colors gap-2"
                 >
                   <Calendar className="w-5 h-5" />
-                  Sewa Kamera Ini
+                  Sewa {camera.category === 'camera' ? 'Kamera' : camera.category === 'lens' ? 'Lensa' : camera.type} Ini
                 </Link>
               ) : (
                 <button

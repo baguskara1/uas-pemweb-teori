@@ -1,5 +1,6 @@
 'use client';
 import { Award, Camera, CheckCircle2, Loader2, ShoppingBag, Sparkles, X } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useToast } from '@/components/shared/Toast';
@@ -10,6 +11,7 @@ type CameraItem = {
   name: string;
   brand: string;
   type: string;
+  category: string;
   price_per_day: number;
   image_url: string | null;
   is_available: boolean;
@@ -84,12 +86,14 @@ export function CameraDetailModal({
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-8">
           <div className="md:col-span-5 space-y-6">
-            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-surface-dark">
+            <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-surface-dark relative">
               {camera.image_url ? (
-                <img
+                <Image
                   src={camera.image_url}
                   alt={camera.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  className="object-cover"
                 />
               ) : (
                 <div className="grid h-full place-items-center">
@@ -293,7 +297,7 @@ export function CameraDetailModal({
                 className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white font-text font-semibold transition-all flex items-center justify-center gap-2"
               >
                 <ShoppingBag className="w-4 h-4" />
-                Sewa Kamera Ini
+                Sewa {camera.category === 'camera' ? 'Kamera' : camera.category === 'lens' ? 'Lensa' : camera.type} Ini
               </button>
             </div>
           </div>
