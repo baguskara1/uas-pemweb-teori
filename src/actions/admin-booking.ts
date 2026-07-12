@@ -2,14 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-
-export type BookingStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'in_progress'
-  | 'returned'
-  | 'completed'
-  | 'cancelled';
+import type { BookingStatus } from '@/lib/constants';
 
 export async function updateBookingStatus(id: string, status: BookingStatus) {
   const supabase = await createClient();

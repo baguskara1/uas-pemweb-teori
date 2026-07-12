@@ -2,26 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import type { BookingStatus } from '@/actions/admin-booking';
+import { BOOKING_STATUS_LABEL as STATUS_LABEL, BOOKING_STATUS_COLOR as STATUS_COLOR } from '@/lib/constants';
+import type { BookingStatus } from '@/lib/constants';
 import { updateBookingStatus } from '@/actions/admin-booking';
 
-export const STATUS_LABEL: Record<BookingStatus, string> = {
-  pending: 'Menunggu',
-  confirmed: 'Dikonfirmasi',
-  in_progress: 'Berlangsung',
-  returned: 'Dikembalikan',
-  completed: 'Selesai',
-  cancelled: 'Dibatalkan',
-};
-
-export const STATUS_COLOR: Record<BookingStatus, string> = {
-  pending: 'bg-primary/10 text-primary',
-  confirmed: 'bg-primary/15 text-primary',
-  in_progress: 'bg-surface-dark text-text-secondary',
-  returned: 'bg-surface-dark text-text-secondary',
-  completed: 'bg-green-50 text-green-700',
-  cancelled: 'bg-red-50 text-red-700',
-};
+export { STATUS_LABEL, STATUS_COLOR };
 
 const ALL_STATUSES: BookingStatus[] = [
   'pending',

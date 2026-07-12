@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import type { BookingStatus } from '@/actions/admin-booking';
-import { STATUS_LABEL, StatusBadge, StatusSelect } from '@/components/admin/BookingStatus';
+import { StatusBadge, StatusSelect } from '@/components/admin/BookingStatus';
+import { BOOKING_STATUS_LABEL, type BookingStatus } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 
 const STATUS_FILTERS = [
@@ -46,7 +46,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
       <div className="flex flex-wrap gap-2">
         {STATUS_FILTERS.map((s) => {
           const active = (status ?? 'all') === s;
-          const label = s === 'all' ? 'Semua' : STATUS_LABEL[s as keyof typeof STATUS_LABEL];
+          const label = s === 'all' ? 'Semua' : BOOKING_STATUS_LABEL[s as keyof typeof BOOKING_STATUS_LABEL];
           return (
             <Link
               key={s}
