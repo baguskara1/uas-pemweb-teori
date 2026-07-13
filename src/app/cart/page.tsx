@@ -67,7 +67,7 @@ export default function CartPage() {
         start_date: firstItemDates?.start || '',
         end_date: firstItemDates?.end || '',
       };
-      console.log('[Cart] Checkout payload:', JSON.stringify(payload, null, 2));
+
       const res = await fetch('/api/payments/midtrans/multi-submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

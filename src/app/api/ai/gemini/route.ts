@@ -44,14 +44,31 @@ async function fetchOpenRouter(prompt: string, systemPrompt?: string) {
 async function handler(request: NextRequest) {
   try {
     const { prompt, systemPrompt } = await request.json();
+    
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
-    const result = await fetchOpenRouter(prompt, systemPrompt);
+
+    const MAX_PROMPT_LEN = 2000;
+    if (prompt.length > MAX_PROMPT_LEN) {
+      return NextResponse.json({ error: 'Prompt too long' }, { status: 400 });
+    }
+
+    if (systemPrompt && typeof systemPrompt === 'string' && systemPrompt.length > 500) {
+      return NextResponse.json({ error: 'System prompt too long' }, { status: 400 });
+    }
+
+    // Sanitize basic HTML tags to prevent prompt injection via markup
+    const sanitizedPrompt = prompt.replace(/<[^>]*>/g, '').slice(0, MAX_PROMPT_LEN);
+    const sanitizedSystemPrompt = systemPrompt 
+      ? systemPrompt.replace(/<[^>]*>/g, '').slice(0, 500) 
+      : undefined;
+
+    const result = await fetchOpenRouter(sanitizedPrompt, sanitizedSystemPrompt);
     return NextResponse.json({ result });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[AI Route Error]:', err);
+    return NextResponse.json({ error: 'INTERNAL_ERROR' }, { status: 500 });
   }
 }
 

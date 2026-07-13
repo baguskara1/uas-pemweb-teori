@@ -1,3 +1,4 @@
+import QRCode from 'qrcode';
 import { type NextRequest, NextResponse } from 'next/server';
 import { chargeQris, generateSnapToken, methodMap, snapConfig } from '@/lib/midtrans';
 import { withRateLimit } from '@/lib/rate-limit';
@@ -40,14 +41,12 @@ async function handler(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log('[Multi-Submit] Received body:', JSON.stringify(body, null, 2));
     const { items, payMethod, start_date, end_date } = body as {
       items: { id: string; start_date: string; end_date: string; duration: number }[];
       payMethod?: string;
       start_date: string;
       end_date: string;
     };
-    console.log('[Multi-Submit] Parsed:', { itemsCount: items?.length, payMethod, start_date, end_date });
 
     // ---- VALIDATION START ----
 
@@ -260,6 +259,8 @@ async function handler(request: NextRequest) {
         itemDetails,
       });
 
+      const qrCodeDataUrl = await QRCode.toDataURL(qrisResponse.qrString);
+
       await supabase
         .from('payments')
         .update({
@@ -277,7 +278,7 @@ async function handler(request: NextRequest) {
             paymentId: payment.id,
             orderId,
             method: 'qris',
-            qrString: qrisResponse.qrString,
+            qrString: qrCodeDataUrl,
             amount: totalAmount,
           },
         },

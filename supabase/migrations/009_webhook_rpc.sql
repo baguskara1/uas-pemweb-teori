@@ -16,15 +16,21 @@ as $$
 declare
   v_payment_id uuid;
   v_booking_id uuid;
+  v_current_status text;
 begin
   -- Lock payment row for update
-  select id, booking_id into v_payment_id, v_booking_id
+  select id, booking_id, status into v_payment_id, v_booking_id, v_current_status
   from payments
   where midtrans_order_id = p_order_id
   for update;
 
   if v_payment_id is null then
     return null;  -- caller interprets as 404
+  end if;
+
+  -- Idempotency: skip if already in a terminal state
+  if v_current_status in ('paid', 'failed', 'expired') then
+    return v_payment_id;
   end if;
 
   update payments set
