@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { Calendar, CreditCard, LayoutDashboard, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +12,7 @@ export function DashboardSidebar() {
   const links = [
     { href: '/dashboard', label: 'Ringkasan', icon: LayoutDashboard },
     { href: '/dashboard/bookings', label: 'Booking Saya', icon: Calendar },
+    { href: '/dashboard/loyalty', label: 'Loyalty Card', icon: CreditCard },
     { href: '/dashboard/profile', label: 'Profil', icon: User },
   ];
 

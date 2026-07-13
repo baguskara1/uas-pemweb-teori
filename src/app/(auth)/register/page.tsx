@@ -9,9 +9,44 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const DISPOSABLE_DOMAINS = [
+    'mailinator.com', 'guerrillamail.com', 'tempmail.com', 'throwaway.com',
+    'yopmail.com', 'sharklasers.com', 'trashmail.com', '10minutemail.com',
+    'temp-mail.org', 'fakeinbox.com', 'maildrop.cc', 'dispostable.com',
+    'getnada.com', 'mail.tm', 'tempail.com', 'emailondeck.com',
+  ];
+
+  const isValidEmail = (e: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(e)) return false;
+
+    const [local, domain] = e.split('@');
+
+    if (local.length > 64) return false;
+    if (domain.length > 255) return false;
+
+    if (/^\d+$/.test(local)) {
+      setError('Email tidak valid — gunakan email asli dengan nama');
+      return false;
+    }
+
+    if (local.match(/^(test|qa|fake|mail|temp|user)\d*$/i)) {
+      setError('Email tidak valid — gunakan email asli Anda');
+      return false;
+    }
+
+    if (DISPOSABLE_DOMAINS.includes(domain.toLowerCase())) {
+      setError('Email sekali pakai tidak diizinkan. Gunakan email permanen.');
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,9 +62,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!isValidEmail(email)) return;
+
     setLoading(true);
 
-    const { error: signUpError } = await signUp(email, password, fullName);
+    const { error: signUpError } = await signUp(email, password, fullName, phone);
 
     if (signUpError) {
       setError(signUpError.message);
@@ -86,6 +123,24 @@ export default function RegisterPage() {
               required
               className="w-full h-touch px-4 font-text text-text-dominant bg-white border border-black/15 rounded-input focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10 transition-colors"
               placeholder="nama@email.com"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="phone"
+              className="block font-text text-xs font-semibold text-text-dominant mb-2"
+            >
+              Nomor WhatsApp
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              className="w-full h-touch px-4 font-text text-text-dominant bg-white border border-black/15 rounded-input focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10 transition-colors"
+              placeholder="08123456789"
             />
           </div>
 

@@ -32,7 +32,11 @@ export function AIBudgetPlanner() {
       .select('id, name, brand, type, price_per_day')
       .eq('is_available', true);
 
-    const inventoryContext = JSON.stringify(cameras ?? []);
+    const inventoryContext = JSON.stringify(
+      (cameras ?? []).slice(0, 40).map((c) => ({
+        name: c.name, brand: c.brand, type: c.type, price_per_day: c.price_per_day,
+      })),
+    );
 
     try {
       const result = await callGeminiAI(

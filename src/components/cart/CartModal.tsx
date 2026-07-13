@@ -303,7 +303,7 @@ export function CartModal({ open, onClose }: CartModalProps) {
                           alt={item.name}
                           width={64}
                           height={64}
-                          className="w-full h-full object-cover"
+                          className="object-contain"
                         />
                       ) : (
                         <div className="w-full h-full grid place-items-center text-text-tertiary text-xs">
@@ -446,6 +446,7 @@ export function CartModal({ open, onClose }: CartModalProps) {
           <div className="shrink-0 px-6 py-4 border-t border-black/10">
             <Link
               href="/dashboard/bookings"
+              onClick={onClose}
               className="w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-full font-text font-semibold transition-colors flex items-center justify-center"
             >
               Lihat Booking Saya

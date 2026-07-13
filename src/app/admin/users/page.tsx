@@ -2,7 +2,7 @@
 
 import { Search } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 type User = {
@@ -19,7 +19,7 @@ export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState<User[]>([]);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchUsers = useCallback(async () => {
     let query = supabase
@@ -40,10 +40,11 @@ export default function AdminUsersPage() {
   }, [searchQuery, supabase]);
 
   useEffect(() => {
-    const loadData = async () => {
-      await fetchUsers();
-    };
-    loadData();
+    const timeout = setTimeout(() => {
+      fetchUsers();
+    }, 300);
+    
+    return () => clearTimeout(timeout);
   }, [fetchUsers]);
 
   return (

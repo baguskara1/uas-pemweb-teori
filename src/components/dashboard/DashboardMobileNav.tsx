@@ -12,6 +12,7 @@ export function DashboardMobileNav() {
   const links = [
     { href: '/dashboard', label: 'Ringkasan' },
     { href: '/dashboard/bookings', label: 'Booking Saya' },
+    { href: '/dashboard/loyalty', label: 'Loyalty' },
     { href: '/dashboard/profile', label: 'Profil' },
   ];
 

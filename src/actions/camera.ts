@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 
 export type CameraFormData = {
   name: string;
@@ -16,7 +16,7 @@ export type CameraFormData = {
 };
 
 async function uploadImage(file: File): Promise<string | null> {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
   const ext = file.name.split('.').pop();
   const filename = `cameras/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
@@ -32,7 +32,7 @@ async function uploadImage(file: File): Promise<string | null> {
 }
 
 export async function createCamera(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const imageFile = formData.get('image') as File | null;
   let image_url: string | null = null;
@@ -58,7 +58,7 @@ export async function createCamera(formData: FormData) {
 }
 
 export async function updateCamera(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const imageFile = formData.get('image') as File | null;
   let image_url: string | undefined;
@@ -85,7 +85,7 @@ export async function updateCamera(id: string, formData: FormData) {
 }
 
 export async function deleteCamera(id: string) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
   const { error } = await supabase.from('cameras').delete().eq('id', id);
   if (error) return { error: error.message };
   revalidatePath('/admin/cameras');

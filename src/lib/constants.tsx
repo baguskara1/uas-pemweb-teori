@@ -16,6 +16,13 @@ export const CAMERA_TYPES = [
   'Lighting',
   'Reflektor',
   'Mic',
+  'Tripod',
+  'Gimbal',
+  'Drone',
+  'Filter',
+  'Strap',
+  'Tas',
+  'Lainnya',
 ] as const;
 
 export const CATEGORIES = [

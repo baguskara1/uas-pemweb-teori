@@ -7,9 +7,10 @@ import { createClient } from '@/lib/supabase/client';
 
 type CancelBookingButtonProps = {
   bookingId: string;
+  label?: string;
 };
 
-export function CancelBookingButton({ bookingId }: CancelBookingButtonProps) {
+export function CancelBookingButton({ bookingId, label = 'Batalkan Booking' }: CancelBookingButtonProps) {
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
@@ -26,7 +27,7 @@ export function CancelBookingButton({ bookingId }: CancelBookingButtonProps) {
     setLoading(false);
 
     if (error) {
-      alert('Gagal membatalkan booking');
+      alert(`Gagal membatalkan ${label.toLowerCase()}`);
       return;
     }
 
@@ -40,7 +41,7 @@ export function CancelBookingButton({ bookingId }: CancelBookingButtonProps) {
         onClick={() => setShowConfirm(true)}
         className="px-6 py-2 rounded-full border border-red-300 text-red-600 font-semibold hover:bg-red-50 transition-colors"
       >
-        Batalkan Booking
+        {label}
       </button>
 
       {showConfirm && (
@@ -48,7 +49,7 @@ export function CancelBookingButton({ bookingId }: CancelBookingButtonProps) {
           <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
             <div className="text-center mb-6">
               <XCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
-              <h2 className="font-display text-2xl font-semibold mb-2">Batalkan Booking?</h2>
+              <h2 className="font-display text-2xl font-semibold mb-2">{label}?</h2>
               <p className="text-text-tertiary">
                 Tindakan ini tidak dapat dibatalkan. Booking akan diubah statusnya menjadi
                 dibatalkan.

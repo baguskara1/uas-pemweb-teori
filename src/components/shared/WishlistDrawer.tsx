@@ -109,7 +109,7 @@ export function WishlistDrawer({ open, onClose }: { open: boolean; onClose: () =
                             alt={item.camera.name}
                             fill
                             sizes="64px"
-                            className="object-cover"
+                            className="object-contain"
                           />
                         ) : (
                           <div className="grid h-full place-items-center">

@@ -53,12 +53,12 @@ body {
     transform: translateY(0) rotateY(0deg);
   }
   50% {
-    transform: translateY(-10px) rotateY(4deg);
+    transform: translateY(-20px) rotateY(8deg);
   }
 }
 
 .hero-float {
-  animation: hero-float 8s ease-in-out infinite;
+  animation: hero-float 4s ease-in-out infinite;
   transform-style: preserve-3d;
   will-change: transform;
 }

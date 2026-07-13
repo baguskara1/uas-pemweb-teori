@@ -56,7 +56,7 @@ export function BookingCard({ booking }: BookingCardProps) {
               height={80}
               loading="lazy"
               unoptimized
-              className="w-full h-full object-cover rounded-xl"
+              className="object-contain"
             />
           ) : (
             <Camera className="w-8 h-8 text-text-tertiary" />

@@ -90,7 +90,7 @@ export function CamerasTable({ cameras }: { cameras: Camera[] }) {
                             alt={camera.name}
                             width={48}
                             height={48}
-                            className="h-full w-full object-cover"
+                            className="object-contain"
                           />
                         ) : (
                           <div className="h-full w-full grid place-items-center text-text-tertiary text-xs">

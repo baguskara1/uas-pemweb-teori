@@ -20,7 +20,7 @@ type LoyaltyCardProps = {
 
 export function LoyaltyCard({ loyaltyCard, history }: LoyaltyCardProps) {
   const currentCount = loyaltyCard?.current_count ?? 0;
-  const maxCount = loyaltyCard?.max_count ?? 5;
+  const maxCount = loyaltyCard?.max_count ?? 3;
   const discountPercent = loyaltyCard?.discount_percent ?? 15;
   const progress = Math.min((currentCount / maxCount) * 100, 100);
   const isReady = currentCount >= maxCount;

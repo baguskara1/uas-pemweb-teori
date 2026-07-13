@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart3, BookOpen, Camera, LogOut, Settings, Users } from 'lucide-react';
+import { BarChart3, BookOpen, Camera, LogOut, Settings, Shield, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +10,7 @@ const links = [
   { href: '/admin/cameras', label: 'Kamera', icon: Camera },
   { href: '/admin/bookings', label: 'Booking', icon: BookOpen },
   { href: '/admin/payments', label: 'Pembayaran', icon: Settings },
+  { href: '/admin/loyalty', label: 'Loyalty', icon: Shield },
   { href: '/admin/users', label: 'Pengguna', icon: Users },
 ];
 

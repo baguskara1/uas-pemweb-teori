@@ -123,7 +123,7 @@ export function CameraCard({ camera }: CameraCardProps) {
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-contain"
           />
         ) : (
           <div className="grid h-full place-items-center bg-gradient-to-br from-surface-dark to-white">

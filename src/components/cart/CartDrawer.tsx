@@ -53,7 +53,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                         alt={item.name}
                         width={56}
                         height={56}
-                        className="w-full h-full object-cover"
+                        className="object-contain"
                       />
                     ) : (
                       <div className="w-full h-full grid place-items-center text-text-tertiary text-xs">

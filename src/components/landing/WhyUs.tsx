@@ -9,7 +9,7 @@ const values = [
   {
     icon: Award,
     title: 'Loyalty Stamp 15%',
-    desc: 'Sistem retensi pelanggan memberikan diskon 15% otomatis pada penyewaan ke-5 Anda.',
+    desc: 'Sistem retensi pelanggan memberikan diskon 15% otomatis setelah terkumpul 3x penyewaan.',
   },
   {
     icon: Clock,

@@ -49,19 +49,20 @@ async function handler(request: NextRequest) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const MAX_PROMPT_LEN = 2000;
+    const MAX_PROMPT_LEN = 12000;
+    const MAX_SYSTEM_LEN = 5000;
     if (prompt.length > MAX_PROMPT_LEN) {
-      return NextResponse.json({ error: 'Prompt too long' }, { status: 400 });
+      return NextResponse.json({ error: 'Prompt terlalu panjang' }, { status: 400 });
     }
 
-    if (systemPrompt && typeof systemPrompt === 'string' && systemPrompt.length > 500) {
+    if (systemPrompt && typeof systemPrompt === 'string' && systemPrompt.length > MAX_SYSTEM_LEN) {
       return NextResponse.json({ error: 'System prompt too long' }, { status: 400 });
     }
 
     // Sanitize basic HTML tags to prevent prompt injection via markup
     const sanitizedPrompt = prompt.replace(/<[^>]*>/g, '').slice(0, MAX_PROMPT_LEN);
     const sanitizedSystemPrompt = systemPrompt 
-      ? systemPrompt.replace(/<[^>]*>/g, '').slice(0, 500) 
+      ? systemPrompt.replace(/<[^>]*>/g, '').slice(0, MAX_SYSTEM_LEN) 
       : undefined;
 
     const result = await fetchOpenRouter(sanitizedPrompt, sanitizedSystemPrompt);

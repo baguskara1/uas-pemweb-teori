@@ -22,7 +22,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   let query = supabase
     .from('bookings')
     .select(
-      `id, status, final_price, start_date, end_date, created_at,
+      `id, status, final_price, start_date, end_date, created_at, order_group,
        camera:cameras(name, brand),
        user:profiles(full_name, email)`,
     )
@@ -32,7 +32,44 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
     query = query.eq('status', status as BookingStatus);
   }
 
-  const { data: bookings } = await query;
+  const { data: rawBookings } = await query;
+
+  let groupedBookings: any[] = [];
+  if (rawBookings) {
+    const groups = new Map();
+    for (const b of rawBookings) {
+      if (b.order_group) {
+        if (!groups.has(b.order_group)) {
+          groups.set(b.order_group, []);
+        }
+        groups.get(b.order_group).push(b);
+      } else {
+        groupedBookings.push(b);
+      }
+    }
+
+    for (const [groupId, items] of groups.entries()) {
+      if (items.length === 1) {
+        groupedBookings.push(items[0]);
+      } else {
+        const first = items[0];
+        const total = items.reduce((sum: number, item: any) => sum + Number(item.final_price), 0);
+        groupedBookings.push({
+          id: `group_${groupId}`,
+          status: first.status,
+          final_price: total,
+          start_date: first.start_date,
+          end_date: first.end_date,
+          created_at: first.created_at,
+          camera: { name: `Paket Sewa (${items.length} Barang)`, brand: 'Multiple Items' },
+          user: first.user,
+        });
+      }
+    }
+  }
+
+  // Re-sort because grouping might mess up the chronological order of groups vs singles
+  groupedBookings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div className="space-y-6">
@@ -59,7 +96,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
         })}
       </div>
 
-      <AdminBookingsTable bookings={bookings ?? []} />
+      <AdminBookingsTable bookings={groupedBookings} />
     </div>
   );
 }

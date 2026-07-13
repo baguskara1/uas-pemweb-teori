@@ -1,4 +1,4 @@
-import { Calendar, Camera, ChevronLeft, Clock, CreditCard } from 'lucide-react';
+import { Calendar, Camera, ChevronLeft, Clock, CreditCard, Package } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -13,7 +13,8 @@ type PageProps = {
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   pending: { label: 'Menunggu', color: 'text-primary', bg: 'bg-primary/10' },
   confirmed: { label: 'Dikonfirmasi', color: 'text-primary', bg: 'bg-primary/20' },
-  active: { label: 'Aktif', color: 'text-green-700', bg: 'bg-green-100' },
+  in_progress: { label: 'Berlangsung', color: 'text-green-700', bg: 'bg-green-100' },
+  returned: { label: 'Dikembalikan', color: 'text-gray-700', bg: 'bg-gray-100' },
   completed: { label: 'Selesai', color: 'text-gray-700', bg: 'bg-gray-100' },
   cancelled: { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' },
 };
@@ -40,12 +41,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
       discount_amount,
       final_price,
       status,
+      order_group,
       created_at,
       camera:cameras (
         id,
         name,
         brand,
         type,
+        category,
         price_per_day,
         image_url
       )
@@ -57,7 +60,31 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
   if (error || !booking) notFound();
 
+  // Get all bookings in same order_group (bundle)
+  let bundleItems: {
+    id: string;
+    camera: { id: string; name: string; brand: string; type: string; category: string; price_per_day: number; image_url: string | null };
+  }[] = [];
+
+  if (booking.order_group) {
+    const { data: groupBookings } = await supabase
+      .from('bookings')
+      .select(`
+        id,
+        camera:cameras (
+          id, name, brand, type, category, price_per_day, image_url
+        )
+      `)
+      .eq('order_group', booking.order_group)
+      .eq('user_id', user.id);
+
+    if (groupBookings) {
+      bundleItems = groupBookings;
+    }
+  }
+
   const statusStyle = statusConfig[booking.status] || statusConfig.pending;
+  const isBundle = bundleItems.length > 1;
 
   const formatCurrency = (value: number) => `Rp ${Math.round(value).toLocaleString('id-ID')}`;
 
@@ -92,8 +119,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
       <div className="bg-white rounded-2xl border border-surface-light p-8">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="font-display text-2xl font-semibold mb-2">Detail Booking</h1>
+            <h1 className="font-display text-2xl font-semibold mb-2">
+              {isBundle ? 'Detail Bundle Sewa' : 'Detail Booking'}
+            </h1>
             <p className="text-sm text-text-tertiary">ID: {booking.id}</p>
+            {booking.order_group && (
+              <p className="text-xs text-text-tertiary mt-0.5">Group: {booking.order_group.slice(0, 8)}...</p>
+            )}
           </div>
           <span
             className={`px-4 py-2 rounded-full text-sm font-semibold ${statusStyle.bg} ${statusStyle.color}`}
@@ -102,38 +134,57 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </span>
         </div>
 
-        {/* Camera Info */}
-        <div className="flex gap-6 mb-8 pb-8 border-b border-surface-light">
-          <div className="w-32 h-32 rounded-xl bg-surface-light flex items-center justify-center flex-shrink-0">
-            {booking.camera.image_url ? (
-              <Image
-                src={booking.camera.image_url}
-                alt={booking.camera.name}
-                width={128}
-                height={128}
-                loading="lazy"
-                unoptimized
-                className="w-full h-full object-cover rounded-xl"
-              />
-            ) : (
-              <Camera className="w-12 h-12 text-text-tertiary" />
-            )}
+        {/* Bundle Items */}
+        <div className="mb-8 pb-8 border-b border-surface-light">
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="w-5 h-5 text-primary" />
+            <h2 className="font-display text-base font-semibold">
+              {isBundle ? `Item Bundle (${bundleItems.length})` : 'Item'}
+            </h2>
           </div>
-          <div className="flex-1">
-            <h2 className="font-display text-xl font-semibold mb-1">{booking.camera.name}</h2>
-            <p className="text-text-secondary mb-2">
-              {booking.camera.brand} • {booking.camera.type}
-            </p>
-            <p className="text-sm text-text-tertiary">
-              {formatCurrency(booking.camera.price_per_day)} / hari
-            </p>
+          <div className="space-y-3">
+            {bundleItems.map((item) => (
+              <div key={item.id} className="flex gap-4 p-3 rounded-xl bg-surface-dark/50">
+                <div className="w-16 h-16 rounded-xl bg-surface-light flex items-center justify-center shrink-0 overflow-hidden">
+                  {item.camera.image_url ? (
+                    <Image
+                      src={item.camera.image_url}
+                      alt={item.camera.name}
+                      width={64}
+                      height={64}
+                      loading="lazy"
+                      unoptimized
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Camera className="w-6 h-6 text-text-tertiary" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/cameras/${item.camera.id}`} className="hover:underline">
+                    <h3 className="font-display font-semibold">{item.camera.name}</h3>
+                  </Link>
+                  <p className="text-xs text-text-tertiary">
+                    {item.camera.brand} • {item.camera.type}
+                  </p>
+                  <p className="text-xs text-primary font-semibold mt-0.5">
+                    {formatCurrency(item.camera.price_per_day)} / hari
+                  </p>
+                </div>
+                {item.id === booking.id && (
+                  <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full self-start">
+                    Active
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Booking Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="flex gap-3">
-            <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+            <Calendar className="w-5 h-5 text-primary shrink-0 mt-1" />
             <div>
               <p className="text-sm text-text-tertiary mb-1">Periode Sewa</p>
               <p className="font-semibold">{formatDate(booking.start_date)}</p>
@@ -142,7 +193,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
 
           <div className="flex gap-3">
-            <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+            <Clock className="w-5 h-5 text-primary shrink-0 mt-1" />
             <div>
               <p className="text-sm text-text-tertiary mb-1">Durasi</p>
               <p className="font-semibold">{booking.duration} hari</p>
@@ -150,7 +201,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
 
           <div className="flex gap-3">
-            <CreditCard className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+            <CreditCard className="w-5 h-5 text-primary shrink-0 mt-1" />
             <div>
               <p className="text-sm text-text-tertiary mb-1">Dibuat Pada</p>
               <p className="font-semibold">{formatDateTime(booking.created_at)}</p>
@@ -172,7 +223,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             </div>
             {booking.discount_amount > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-text-secondary">Diskon</span>
+                <span className="text-text-secondary">Diskon Loyalty</span>
                 <span className="font-medium text-green-600">
                   -{formatCurrency(booking.discount_amount)}
                 </span>
@@ -199,7 +250,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <p className="text-sm text-text-tertiary mb-1">Booking telah dikonfirmasi</p>
               <p className="text-xs text-text-tertiary">Selesaikan pembayaran untuk mengaktifkan sewa</p>
             </div>
-            <PayNowButton bookingId={booking.id} />
+            <div className="flex gap-3 items-center">
+              <CancelBookingButton bookingId={booking.id} label="Batalkan Pembayaran" />
+              <PayNowButton bookingId={booking.id} orderGroup={booking.order_group} />
+            </div>
           </div>
         )}
       </div>

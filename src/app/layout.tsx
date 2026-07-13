@@ -36,7 +36,7 @@ export default function RootLayout({
           <CartProvider>
             <ToastProvider>
               <Navbar />
-              <main className="flex-1 pt-touch">{children}</main>
+              <main className="flex-1 pt-16">{children}</main>
               <Footer />
             </ToastProvider>
           </CartProvider>

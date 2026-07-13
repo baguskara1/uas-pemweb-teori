@@ -19,10 +19,10 @@ export function Navbar() {
     <>
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/10">
       <div className="max-w-container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-touch">
+        <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 group">
-            <Camera className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-            <span className="font-display font-semibold text-text-dominant">Sewa Kamera Ryox</span>
+            <Camera className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
+            <span className="font-display text-lg font-bold text-text-dominant">Sewa Kamera Ryox</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -92,7 +92,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="inline-flex h-touch items-center justify-center px-6 bg-primary hover:bg-primary-hover text-white font-text rounded-full transition-colors font-semibold"
+                  className="inline-flex h-10 items-center justify-center px-6 bg-primary hover:bg-primary-hover text-white font-text rounded-full transition-colors font-semibold"
                 >
                   Daftar
                 </Link>
@@ -193,7 +193,7 @@ export function Navbar() {
                   </Link>
                   <Link
                     href="/register"
-                    className="flex h-touch items-center justify-center px-6 bg-primary hover:bg-primary-hover text-white font-text rounded-full transition-colors font-semibold text-center"
+                    className="flex h-10 items-center justify-center px-6 bg-primary hover:bg-primary-hover text-white font-text rounded-full transition-colors font-semibold text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Daftar

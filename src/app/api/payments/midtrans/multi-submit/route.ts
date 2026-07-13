@@ -48,6 +48,22 @@ async function handler(request: NextRequest) {
       end_date: string;
     };
 
+    // ---- BLACKLIST CHECK ----
+    const { data: rawCard } = await supabase
+      .from('loyalty_cards')
+      .select('is_blacklisted')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const card = rawCard as unknown as { is_blacklisted: boolean } | null;
+
+    if (card?.is_blacklisted) {
+      return NextResponse.json(
+        { success: false, message: 'Akun Anda telah diblacklist. Hubungi admin.', error: 'BLACKLISTED' },
+        { status: 403 },
+      );
+    }
+
     // ---- VALIDATION START ----
 
     // 1. items: array non-empty
